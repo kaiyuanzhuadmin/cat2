@@ -445,8 +445,7 @@
 
 <script>
 const CARD_ICONS = [
-  "🐱", "🐶", "🐻", "🐼", "🦊", "🐵", "🦁", "🐸", "🐧", "🐨",
-  "🍉", "🍓", "🍇", "🍊", "🍎", "🍒", "🍋", "🥝"
+  "🐱", "🐶", "🐻", "🐼", "🦊", "🐵", "🦁", "🐸", "🐧", "🐨", "🐭", "🐰"
 ];
 const LEVELS = [
   {num: 1, visible: 18, total: 21, stack: 1, rows: 3, cols: 6, overlap: 30},
@@ -454,7 +453,7 @@ const LEVELS = [
 ];
 const TEMP_LIMIT = 7;
 const CODE = "kaiyuan";
-const TOOL_GRANT_COUNT = 3;
+const TOOL_GRANT_COUNT = 9;
 
 // --- Get Audio elements once ---
 const bgm = document.getElementById('bgm');
@@ -517,101 +516,191 @@ function playClickSound() {
 // 随机混乱紧凑堆叠
 function genLevel(levelIdx){
   const lv = LEVELS[levelIdx-1];
-  let iconsNeeded = Math.ceil(lv.total/3);
-  let icons = randArr(CARD_ICONS).slice(0,iconsNeeded);
   
-  // 1. Create a perfectly balanced set of logical cards
+  // 1. Generate icons ensuring each appears a multiple of 3 times
+  let allIcons = [];
+  // Ensure enough unique icons for the level's total cards / 3
+  const requiredUniqueIcons = Math.ceil(lv.total / 3);
+  let availableIcons = randArr(CARD_ICONS); // Shuffle available icons
+  // If not enough unique icons are available for the total number of cards,
+  // we might run into an issue. For now, assume CARD_ICONS is sufficient.
+  availableIcons = availableIcons.slice(0, Math.min(availableIcons.length, requiredUniqueIcons + 2)); // Use a few extra to ensure variety
+
+  let iconPool = [];
+  // Populate iconPool with required number of each icon
+  for (let i = 0; i < requiredUniqueIcons; i++) {
+    for (let j = 0; j < 3; j++) { // Each icon appears at least 3 times
+      iconPool.push(availableIcons[i % availableIcons.length]);
+    }
+  }
+  // Fill the rest of the total cards, ensuring multiples of 3
+  while (iconPool.length < lv.total) {
+      const remaining = lv.total - iconPool.length;
+      if (remaining < 3) {
+          // Add enough from the available icons to make up to a multiple of 3
+          // This ensures the total number of icons remains a multiple of 3
+          for (let i = 0; i < remaining; i++) {
+              iconPool.push(availableIcons[i % availableIcons.length]);
+          }
+      } else {
+          // Add 3 of an icon
+          const iconToAdd = availableIcons[Math.floor(Math.random() * availableIcons.length)];
+          iconPool.push(iconToAdd, iconToAdd, iconToAdd);
+      }
+  }
+  shuffle(iconPool); // Shuffle the icons for random distribution
+  allIcons = iconPool;
+
+  // 2. Create logical cards with unique IDs
   let cards = [];
-  for(let i=0;i<lv.total;i++){
+  for(let i = 0; i < lv.total; i++){
     cards.push({
       id: i,
-      icon: icons[i%icons.length],
+      icon: allIcons[i],
       matched: false
     });
   }
-  shuffle(cards);
 
-  // 2. Place ALL logical cards onto the physical board
+  // 3. Place ALL logical cards onto the physical board
   let board = [];
-  let areaW = document.getElementById('card-stack-area').offsetWidth;
-  let areaH = document.getElementById('card-stack-area').offsetHeight;
+  const areaW = document.getElementById('card-stack-area').offsetWidth;
+  const areaH = document.getElementById('card-stack-area').offsetHeight;
 
-  let cardW = 60;
-  let cardH = 80;
-  if (levelIdx === 2) {
-    cardW = 45;
-    cardH = 60;
-  }
+  let cardW = (levelIdx === 2) ? 45 : 60;
+  let cardH = (levelIdx === 2) ? 60 : 80;
   let stackDepth = lv.stack;
 
-  // --- BUG FIX STARTS HERE ---
-  // The original loop used random numbers, causing an incorrect total number of cards to be placed.
-  // This new loop iterates through all cards deterministically, ensuring board.length === lv.total.
+  // Max number of cards per stack layer
+  const cardsPerStackLayer = Math.ceil(lv.total / stackDepth);
+
   for (let cardIdx = 0; cardIdx < lv.total; cardIdx++) {
-    // Determine which stack layer the card belongs to, ensuring even distribution
-    const s = Math.floor(cardIdx / (lv.total / stackDepth));
+    // Determine which stack layer the card belongs to
+    const s = Math.min(Math.floor(cardIdx / cardsPerStackLayer), stackDepth - 1);
     
-    // Position the card randomly within the area
-    let maxTry = 30, tryCount = 0, ok = false, x = 0, y = 0;
-    while (tryCount < maxTry && !ok) {
-      x = randBetween(5, areaW - cardW - 5) + randBetween(-5, 5) * (s / 2);
-      y = randBetween(5, areaH - cardH - 5) + randBetween(-5, 5) * (s / 2);
-      ok = true;
-      tryCount++;
+    let x = 0, y = 0;
+    // Attempt to find a suitable position to avoid too much overlap
+    let maxAttempts = 50; // Increased attempts for better distribution
+    let foundPosition = false;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      let tempX = randBetween(5, areaW - cardW - 5);
+      let tempY = randBetween(5, areaH - cardH - 5);
+      
+      // Add slight offset based on stack layer to create a "pile" effect
+      tempX += (s * 5 * (Math.random() - 0.5));
+      tempY += (s * 5 * (Math.random() - 0.5));
+
+      // Ensure positions are within bounds after offset
+      tempX = Math.max(5, Math.min(tempX, areaW - cardW - 5));
+      tempY = Math.max(5, Math.min(tempY, areaH - cardH - 5));
+
+      // Check for overlap with existing cards in the same or lower stack
+      let overlap = false;
+      for (const existingCard of board) {
+        // Only consider overlap with cards in the same or lower stack layers
+        if (existingCard.stack <= s) {
+          const dx = Math.abs(tempX - existingCard.x);
+          const dy = Math.abs(tempY - existingCard.y);
+          // Define a relaxed overlap threshold
+          if (dx < cardW * 0.7 && dy < cardH * 0.7) {
+            overlap = true;
+            break;
+          }
+        }
+      }
+
+      if (!overlap) {
+        x = tempX;
+        y = tempY;
+        foundPosition = true;
+        break;
+      }
     }
     
-    // Determine z-index based on stack layer and position within the layer
-    const z = s * 100 + (cardIdx % Math.floor(lv.total / stackDepth));
-    
+    // If no suitable position found after attempts, just place it.
+    // This is a fallback and ideally should not be hit often with increased attempts.
+    if (!foundPosition) {
+        x = randBetween(5, areaW - cardW - 5);
+        y = randBetween(5, areaH - cardH - 5);
+    }
+
+    // Determine z-index based on stack layer and order within the layer
+    // Higher stack means higher z-index. Within a layer, later cards are higher.
+    const z = s * 1000 + cardIdx; // Increased multiplier for better separation
+
     board.push({
       id: cards[cardIdx].id,
       icon: cards[cardIdx].icon,
       x, y, z,
       matched: false,
-      covered: false,
-      stack: s
+      covered: false, // This property is not strictly used later, but kept for consistency
+      stack: s // Store the stack layer
     });
   }
-  // --- BUG FIX ENDS HERE ---
   
-  // 3. Calculate which cards are covered
-  for(let i=0; i<board.length; i++){
+  // Sort board by z-index for correct rendering order
+  board.sort((a, b) => a.z - b.z);
+
+  // 4. Calculate which cards are covered
+  for(let i = 0; i < board.length; i++){
     let ci = board[i];
     ci.coveredBy = [];
-    for(let j=0; j<board.length; j++){
+    for(let j = 0; j < board.length; j++){
       if(i === j) continue;
       let cj = board[j];
-      // A card is covered if another card is in a higher stack (s) and overlaps it
-      if(cj.stack > ci.stack && Math.abs(cj.x - ci.x) < cardW * 0.6 && Math.abs(cj.y - ci.y) < cardH * 0.6){
+      // A card `ci` is covered by `cj` if `cj` is above `ci` (higher z-index)
+      // and their bounding boxes significantly overlap.
+      // Adjust overlap threshold based on card size
+      const overlapThresholdX = cardW * 0.6;
+      const overlapThresholdY = cardH * 0.6;
+
+      if(cj.z > ci.z && 
+         Math.abs(cj.x - ci.x) < overlapThresholdX && 
+         Math.abs(cj.y - ci.y) < overlapThresholdY)
+      {
         ci.coveredBy.push(cj.id);
       }
     }
   }
   
-  return {cards, board, usedIcons:icons};
+  return {cards, board, usedIcons: availableIcons.slice(0, Math.ceil(lv.total/3))};
 }
+
 function randBetween(a,b){ return a + Math.random()*(b-a); }
+
+// Modified isCardClickable to correctly use `coveredBy` array
 function isCardClickable(card, board){
   if(card.matched) return false;
   let self = board.find(c=>c.id===card.id);
+  if (!self) return false; // Card might not be found if already removed/matched
+  
+  // A card is clickable if no card that *covers it* is still unmatched.
+  // We need to check if all cards listed in `self.coveredBy` are `matched`.
   return self.coveredBy.every(cid=>{
-    let c = board.find(cc=>cc.id===cid);
-    return c && c.matched;
+    let coveringCard = board.find(cc=>cc.id===cid);
+    return coveringCard && coveringCard.matched; // If covering card exists, it must be matched
   });
 }
+
 function renderBoard(){
   const area = document.getElementById('card-stack-area');
   area.innerHTML = '';
-  let cards = game.board;
-  cards.forEach(card=>{
+  let cardsToRender = game.board.filter(c => !c.matched); // Only render unmatched cards
+  
+  // Sort cards by z-index for correct display order (higher z-index on top)
+  cardsToRender.sort((a, b) => a.z - b.z); 
+
+  cardsToRender.forEach(card=>{
     let el = document.createElement('div');
-    el.className = "card"+(card.matched?" matched":"")+(isCardClickable(card,game.board)?"":" disabled");
+    // Determine if the card is currently clickable
+    const clickable = isCardClickable(card, game.board);
+    el.className = "card" + (clickable ? "" : " disabled");
     el.style.left = card.x+'px';
     el.style.top = card.y+'px';
-    el.style.zIndex = card.z+(card.matched?-20:0);
+    el.style.zIndex = card.z; // Use the calculated z-index
     el.innerHTML = card.icon;
     el.dataset.id = card.id; // Add data-id for easier selection
-    if(!card.matched && isCardClickable(card,game.board)){
+    
+    if(clickable){
       el.onclick = ()=>clickCard(card.id);
     }
     area.appendChild(el);
@@ -645,18 +734,26 @@ function showMessage(msg, color){
 
 function clickCard(id) {
   if (game.lock) return;
-  let cardDataIndex = game.board.findIndex(c => c.id === id);
-  if (cardDataIndex === -1 || game.board[cardDataIndex].matched) return;
-  if (!isCardClickable(game.board[cardDataIndex], game.board)) return;
+  let cardData = game.board.find(c => c.id === id); // Find the card data
+  
+  if (!cardData || cardData.matched || !isCardClickable(cardData, game.board)) return;
   if (game.temp.length >= TEMP_LIMIT) {
-    setTimeout(() => gameOver('暂存区已超限，游戏失败！'), 100);
-    return;
+    // If temp area is full AND no immediate match possible, then it's game over
+    // Check if a match is possible after adding this card to the temp area
+    let tempCheck = [...game.temp, { icon: cardData.icon, id: cardData.id }];
+    let iconCnt = {};
+    tempCheck.forEach(c => iconCnt[c.icon] = (iconCnt[c.icon] || 0) + 1);
+    let matchedIcon = Object.keys(iconCnt).find(k => iconCnt[k] === 3);
+
+    if (!matchedIcon) { // If no match possible even with this card
+        setTimeout(() => gameOver('暂存区已超限，游戏失败！'), 100);
+        return;
+    }
   }
 
   game.lock = true;
   saveStep();
 
-  const cardData = game.board[cardDataIndex];
   const clickedCardEl = document.querySelector(`#card-stack-area .card[data-id='${id}']`);
 
   if (!clickedCardEl) {
@@ -666,12 +763,12 @@ function clickCard(id) {
 
   // --- Animation Start ---
   const startRect = clickedCardEl.getBoundingClientRect();
+  
+  // Temporarily add card to temp array to determine its final position
+  const tempForPosition = [...game.temp, { icon: cardData.icon, id: cardData.id }];
+  tempForPosition.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
+  const endSlotIndex = tempForPosition.findIndex(c => c.id === id);
   const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
-
-  // Find where the new card will be placed after sorting
-  const tempWithNewCard = [...game.temp, { icon: cardData.icon, id: cardData.id }];
-  tempWithNewCard.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
-  const endSlotIndex = tempWithNewCard.findIndex(c => c.id === id);
   const endRect = tempSlots[endSlotIndex].getBoundingClientRect();
 
   const flyingCard = document.createElement('div');
@@ -703,7 +800,7 @@ function clickCard(id) {
     // --- Animation End ---
 
     // --- Original Logic Resumes ---
-    cardData.matched = true;
+    cardData.matched = true; // Mark the card on the board as matched
     game.temp.push({ icon: cardData.icon, id: cardData.id, matched: false });
     game.temp.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
     renderTemp();
@@ -721,7 +818,7 @@ function clickCard(id) {
       setTimeout(() => {
         game.temp = game.temp.filter(c => !c.matched);
         renderTemp();
-        renderBoard();
+        renderBoard(); // Re-render board to update clickable states
         checkWin();
         game.lock = false; // Unlock after match animation
       }, 330);
@@ -736,6 +833,7 @@ function clickCard(id) {
     renderProgress();
   }, 350); // This must match the CSS transition duration
 }
+
 
 function checkWin(){
   if(game.board.every(c=>c.matched)){
@@ -757,10 +855,12 @@ function updateToolButtons() {
   document.getElementById('shuffle-btn').disabled = game.toolUses.shuffle <= 0;
 }
 document.getElementById('undo-btn').onclick = function(){
-  if(game.toolUses.undo > 0){
+  if(game.toolUses.undo > 0 && game.stepStack.length > 0){
     undoStep();
     game.toolUses.undo--;
     updateToolButtons();
+  } else if (game.toolUses.undo > 0 && game.stepStack.length === 0) {
+    showMessage('无法撤销更多', '#888');
   }
 };
 document.getElementById('hint-btn').onclick = function(){
@@ -804,48 +904,76 @@ function undoStep(){
 function shuffleStep(){
   let unmatched = game.board.filter(c=>!c.matched);
   let icons = unmatched.map(c=>c.icon);
-  shuffle(icons);
-  unmatched.forEach((c,i)=>c.icon=icons[i]);
+  shuffle(icons); // Shuffle the icons
+  
+  // Reassign icons to unmatched cards while maintaining their positions
+  unmatched.forEach((c,i)=>{
+      c.icon = icons[i];
+  });
+
+  // Re-evaluate coveredBy after shuffle, as icon doesn't affect coverage
+  // (though the original shuffle didn't change positions, so this might be redundant for this specific shuffle)
+  // For now, simply re-rendering should suffice as only icons changed.
   renderAll();
   showMessage('已洗牌');
 }
+
 function hintStep(){
-  let cnt = {};
-  let all = game.temp.concat(game.board.filter(c=>!c.matched && isCardClickable(c,game.board)).map(c=>({icon:c.icon,id:c.id})));
-  all.forEach(c=>cnt[c.icon]=cnt[c.icon]?cnt[c.icon]+1:1);
-  let target = null;
-  for(let k in cnt){ if(cnt[k]>=3){ target=k;break; } }
-  if(target){
+  let tempIcons = game.temp.map(c => c.icon);
+  let clickableBoardCards = game.board.filter(c => !c.matched && isCardClickable(c, game.board));
+  let clickableBoardIcons = clickableBoardCards.map(c => c.icon);
+
+  let allAvailableIcons = [...tempIcons, ...clickableBoardIcons];
+
+  let iconCounts = {};
+  allAvailableIcons.forEach(icon => {
+    iconCounts[icon] = (iconCounts[icon] || 0) + 1;
+  });
+
+  let targetIcon = null;
+  for (let icon in iconCounts) {
+    if (iconCounts[icon] >= 3) {
+      targetIcon = icon;
+      break;
+    }
+  }
+
+  if (targetIcon) {
     let hintDone = 0;
     const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
-    for(let i=0;i<game.temp.length;i++){
-      if(game.temp[i].icon===target && !game.temp[i].matched && hintDone<3) {
+
+    // Hint cards in the temporary area
+    for (let i = 0; i < game.temp.length && hintDone < 3; i++) {
+      if (game.temp[i].icon === targetIcon && !game.temp[i].matched) {
         const tempCardElement = tempSlots[i].querySelector('.temp-card');
         if (tempCardElement) {
-            tempCardElement.style.borderColor = '#f26b4b';
-            hintDone++;
+          tempCardElement.style.borderColor = '#f26b4b';
+          tempCardElement.style.boxShadow = '0 0 16px #fe9e7a';
+          hintDone++;
         }
       }
     }
-    for(let i=0;i<game.board.length && hintDone<3;i++){
-      if(!game.board[i].matched && game.board[i].icon===target && isCardClickable(game.board[i],game.board)){
-        let doms = document.querySelectorAll('#card-stack-area .card');
-        for(let j=0;j<doms.length;j++){
-          if(Math.abs(parseFloat(doms[j].style.left) - game.board[i].x) < 2 &&
-             Math.abs(parseFloat(doms[j].style.top) - game.board[i].y) < 2){
-            doms[j].style.borderColor='#f26b4b'; doms[j].style.boxShadow='0 0 16px #fe9e7a';
-            hintDone++;
-            break;
-          }
+
+    // Hint clickable cards on the board
+    for (let i = 0; i < clickableBoardCards.length && hintDone < 3; i++) {
+      let boardCard = clickableBoardCards[i];
+      if (boardCard.icon === targetIcon) {
+        let doms = document.querySelector(`#card-stack-area .card[data-id='${boardCard.id}']`);
+        if (doms) {
+          doms.style.borderColor = '#f26b4b';
+          doms.style.boxShadow = '0 0 16px #fe9e7a';
+          hintDone++;
         }
       }
     }
+    
     showMessage('已高亮可消除三张');
-    setTimeout(renderAll,1700);
+    setTimeout(renderAll, 1700); // Clear highlight after some time
   } else {
     showMessage('当前无可三消', "#888");
   }
 }
+
 document.getElementById('code-btn').onclick=function(){
   let val = document.getElementById('code-input').value.trim().toLowerCase();
   if(val===CODE){
@@ -906,7 +1034,7 @@ function startGame(level){
   game.usedIcons = lv.usedIcons;
   game.temp = [];
   game.matched = [];
-  game.toolUses = {undo: 0, hint: 0, shuffle: 0};
+  game.toolUses = {undo: 0, hint: 0, shuffle: 0}; // Reset tools on new game/restart
   game.stepStack = [];
   game.lock = false;
   renderAll();
