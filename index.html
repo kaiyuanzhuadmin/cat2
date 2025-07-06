@@ -1,457 +1,459 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-  <title>猫了个猫 - 网页小游戏</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', 'PingFang SC', 'Helvetica Neue', Arial, 'Microsoft Yahei', sans-serif;
-      background: #b6e388 url('https://img.zcool.cn/community/01e3f05c2c1e7ea801214168e1e7e2.jpg') no-repeat center center fixed;
-      background-size: cover;
-      min-height: 100vh;
-      overflow-x: hidden;
-      color: #333;
-    }
-    #game-container {
-      max-width: 480px;
-      margin: 24px auto 0 auto;
-      background: rgba(255,255,255,0.92);
-      border-radius: 18px;
-      box-shadow: 0 2px 16px #7db36a60;
-      padding: 0 0 24px 0;
-      position: relative;
-      min-height: 700px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    @media (max-width: 540px) {
-      #game-container { max-width: 100vw; box-shadow: none; border-radius: 0; min-height: 95vh;}
-    }
-    #header-bar {
-      width: 100%;
-      padding: 12px 20px 0 20px;
-      box-sizing: border-box;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    #progress-info {
-      font-size: 1rem;
-      font-weight: bold;
-    }
-    #music-toggle {
-      background: none;
-      border: none;
-      outline: none;
-      font-size: 1.6rem;
-      cursor: pointer;
-    }
-    #main-area {
-      flex:1;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-    }
-    #card-stack-area {
-      margin-top: 10px;
-      width: 400px; /* Increased width */
-      height: 300px; /* Increased height */
-      position: relative;
-      background: rgba(255,255,255,0.10);
-      border-radius: 10px;
-      box-shadow: 0 2px 6px #d8ecd8cc;
-      overflow: visible;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    @media (max-width: 400px) {
-      #card-stack-area {
-        width: 96vw; /* Adjusted for mobile */
-        min-width: 220px;
-        height: 280px; /* Adjusted for mobile */
-      }
-    }
-    /* Default card size */
-    .card {
-      width: 60px; /* Adjusted card width */
-      height: 80px; /* Adjusted card height */
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px #c2d6b3b0, 2px 4px 16px #aaa4;
-      border: 2px solid #b6e388;
-      position: absolute;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.4rem; /* Slightly larger icon */
-      cursor: pointer;
-      user-select: none;
-      transition: transform 0.10s, box-shadow 0.13s, opacity 0.3s;
-      z-index: 1;
-      overflow: hidden;
-    }
-    .card.selected {
-      border: 2.5px solid #558c25;
-      box-shadow: 0 2px 18px #b6e388;
-      z-index: 100 !important;
-      transform: scale(1.08) rotate(-3deg);
-    }
-    .card.disabled {
-      opacity: 0.42;
-      pointer-events: none;
-    }
-    .card.matched {
-      opacity: 0.1;
-      transition: opacity 0.23s;
-      pointer-events: none;
-    }
-    .card .mini {
-      font-size: 1.1rem;
-      position: absolute;
-      bottom: 6px;
-      right: 8px;
-      opacity: 0.45;
-    }
-    #temp-area {
-      margin: 14px auto 0 auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 68px;
-      width: 380px; /* Adjusted width to fit 7 slots + margins */
-      border-radius: 8px;
-      background: #f7f7f7;
-      border: 1.5px dashed #b6e388;
-      padding: 7px 0;
-      box-sizing: border-box;
-    }
-    .temp-slot { /* New style for the temporary slot placeholders */
-      width: 50px;
-      height: 65px;
-      margin: 0 4px; /* Adjusted margin */
-      background: #e0e0e0; /* A slightly darker background for empty slots */
-      border-radius: 7px;
-      border: 2px dashed #a0a0a0; /* Distinct dashed border for empty slots */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      color: #777; /* Text color for empty slots if needed, not used for icons */
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      position: relative;
-      overflow: hidden; /* Ensure card content stays within bounds */
-    }
-    .temp-card { /* Style for cards placed in temp slots */
-      width: 100%;
-      height: 100%;
-      background: #fff;
-      border-radius: 7px;
-      border: 2px solid #c5e6b3; /* Solid border for active cards */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      box-shadow: 0 2px 6px #b6e38880;
-      cursor: default;
-      position: absolute; /* Position within the slot */
-      transition: opacity 0.18s;
-      box-sizing: border-box; /* Include padding and border in the element's total width and height */
-    }
-    .temp-card.matched {
-      opacity: 0.1;
-    }
-    /* --- New style for the animated "flying" card --- */
-    .flying-card {
-      width: 60px;
-      height: 80px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px #c2d6b3b0, 2px 4px 16px #aaa4;
-      border: 2px solid #b6e388;
-      position: fixed; /* Use fixed positioning for viewport-relative animation */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.4rem;
-      user-select: none;
-      z-index: 999; /* Ensure it's on top of everything */
-      transition: top 0.35s ease-in-out, left 0.35s ease-in-out, transform 0.35s ease-in-out;
-      overflow: hidden;
-    }
-    #tools-bar {
-      margin: 14px auto 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      width: 380px; /* Adjusted to accommodate the new button */
-      flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
-    }
-    #tools-bar button {
-      padding: 7px 15px;
-      background: #e6f6d3;
-      border: 1.5px solid #b6e388;
-      border-radius: 7px;
-      font-size: 1rem;
-      color: #335c1d;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.13s;
-      outline: none;
-      position: relative;
-      min-width: 68px;
-    }
-    #tools-bar button:disabled {
-      background: #f0f0f0;
-      color: #b0b0b0;
-      border-color: #d0d0d0;
-      cursor: not-allowed;
-    }
-    #restart-btn { /* Style for the new restart button */
-      background: #ffe0b3;
-      border-color: #ffcc80;
-      color: #96602c;
-    }
-    #restart-btn:hover {
-      background: #ffd599;
-    }
-    #code-bar {
-      margin: 10px auto 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      width: 340px;
-    }
-    #code-bar input {
-      width: 110px;
-      padding: 5px 8px;
-      border-radius: 6px;
-      border: 1.5px solid #b6e388;
-      outline: none;
-      font-size: 1rem;
-      margin-right: 3px;
-    }
-    #code-bar button {
-      padding: 5px 8px;
-      font-size: 1rem;
-      background: #e6f6d3;
-      border: 1.5px solid #b6e388;
-      border-radius: 7px;
-      cursor: pointer;
-      color: #335c1d;
-      font-weight: bold;
-      transition: background 0.13s;
-      min-width: 56px;
-    }
-    #message-bar {
-      margin: 10px auto 0 auto;
-      text-align: center;
-      font-size: 1.02rem;
-      color: #e65c4f;
-      min-height: 24px;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-    #start-screen, #level-finish, #game-over {
-      position: absolute;
-      left: 0; right: 0; top: 0; bottom: 0;
-      z-index: 88;
-      background: rgba(255,255,255,0.92);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      font-size: 1.2rem;
-      border-radius: 18px;
-      text-align: center;
-    }
-    #start-screen h1 {
-      font-size: 2.3rem;
-      margin: 0 0 18px 0;
-      color: #6e352f;
-      font-family: 'Comic Sans MS', 'Segoe Print', cursive;
-      letter-spacing: 2px;
-      text-shadow: 1px 1px 0 #c5e6b3, 2px 2px 0 #b6e388;
-    }
-    #start-screen .start-btn {
-      margin-top: 20px;
-      padding: 12px 42px;
-      font-size: 1.3rem;
-      background: linear-gradient(90deg,#b6e388,#c5e6b3);
-      border: none;
-      border-radius: 11px;
-      color: #335c1d;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 2px 8px #b6e388;
-      transition: background 0.15s;
-    }
-    #start-screen .start-btn:hover {
-      background: linear-gradient(90deg,#c5e6b3,#b6e388);
-    }
-    #level-finish, #game-over {
-      font-size: 1.7rem;
-      color: #335c1d;
-      background: rgba(255,255,255,0.97);
-      border-radius: 18px;
-    }
-    #level-finish button, #game-over button {
-      margin-top: 22px;
-      padding: 10px 28px;
-      font-size: 1.12rem;
-      background: #e6f6d3;
-      border: 1.5px solid #b6e388;
-      border-radius: 9px;
-      color: #335c1d;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.13s;
-    }
-    #level-finish button:hover, #game-over button:hover {
-      background: #d2e5bb;
-    }
-    #retry-btn {
-      margin-top: 14px;
-      padding: 9px 24px;
-      font-size: 1.08rem;
-      background: #f5eac6;
-      border: 1.5px solid #e5d88a;
-      border-radius: 7px;
-      color: #6e352f;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.13s;
-      display: inline-block;
-    }
-    #retry-btn:hover {
-      background: #f7f4de;
-    }
-    #footer {
-      margin: 16px auto 0 auto;
-      width: 100%;
-      text-align: center;
-      font-size: 0.98rem;
-      color: #558c25;
-      font-family: 'Comic Sans MS', 'Segoe Print', cursive;
-      letter-spacing: 1.4px;
-    }
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+ <title>猫了个猫 - 网页小游戏</title>
+ <style>
+   body {
+     margin: 0;
+     font-family: 'Segoe UI', 'PingFang SC', 'Helvetica Neue', Arial, 'Microsoft Yahei', sans-serif;
+     background: #b6e388 url('https://img.zcool.cn/community/01e3f05c2c1e7ea801214168e1e7e2.jpg') no-repeat center center fixed;
+     background-size: cover;
+     min-height: 100vh;
+     overflow-x: hidden;
+     color: #333;
+   }
+   #game-container {
+     max-width: 480px;
+     margin: 24px auto 0 auto;
+     background: rgba(255,255,255,0.92);
+     border-radius: 18px;
+     box-shadow: 0 2px 16px #7db36a60;
+     padding: 0 0 24px 0;
+     position: relative;
+     min-height: 700px;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+   }
+   @media (max-width: 540px) {
+     #game-container { max-width: 100vw; box-shadow: none; border-radius: 0; min-height: 95vh;}
+   }
+   #header-bar {
+     width: 100%;
+     padding: 12px 20px 0 20px;
+     box-sizing: border-box;
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+   }
+   #progress-info {
+     font-size: 1rem;
+     font-weight: bold;
+   }
+   #music-toggle {
+     background: none;
+     border: none;
+     outline: none;
+     font-size: 1.6rem;
+     cursor: pointer;
+   }
+   #main-area {
+     flex:1;
+     width: 100%;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: flex-start;
+   }
+   #card-stack-area {
+     margin-top: 10px;
+     width: 400px; /* Increased width */
+     height: 300px; /* Increased height */
+     position: relative;
+     background: rgba(255,255,255,0.10);
+     border-radius: 10px;
+     box-shadow: 0 2px 6px #d8ecd8cc;
+     overflow: visible;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+   }
+   @media (max-width: 400px) {
+     #card-stack-area {
+       width: 96vw; /* Adjusted for mobile */
+       min-width: 220px;
+       height: 280px; /* Adjusted for mobile */
+     }
+   }
+   /* Default card size */
+   .card {
+     width: 60px; /* Adjusted card width */
+     height: 80px; /* Adjusted card height */
+     background: #fff;
+     border-radius: 8px;
+     box-shadow: 0 2px 10px #c2d6b3b0, 2px 4px 16px #aaa4;
+     border: 2px solid #b6e388;
+     position: absolute;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     font-size: 2.4rem; /* Slightly larger icon */
+     cursor: pointer;
+     user-select: none;
+     transition: transform 0.06s, box-shadow 0.09s, opacity 0.15s; /* SPEED UP */
+     z-index: 1;
+     overflow: hidden;
+   }
+   .card.selected {
+     border: 2.5px solid #558c25;
+     box-shadow: 0 2px 18px #b6e388;
+     z-index: 100 !important;
+     transform: scale(1.08) rotate(-3deg);
+   }
+   .card.disabled {
+     opacity: 0.42;
+     pointer-events: none;
+   }
+   .card.matched {
+     opacity: 0.1;
+     transition: opacity 0.15s; /* SPEED UP */
+     pointer-events: none;
+   }
+   .card .mini {
+     font-size: 1.1rem;
+     position: absolute;
+     bottom: 6px;
+     right: 8px;
+     opacity: 0.45;
+   }
+   #temp-area {
+     margin: 14px auto 0 auto;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     min-height: 68px;
+     width: 380px; /* Adjusted width to fit 7 slots + margins */
+     border-radius: 8px;
+     background: #f7f7f7;
+     border: 1.5px dashed #b6e388;
+     padding: 7px 0;
+     box-sizing: border-box;
+   }
+   .temp-slot { /* New style for the temporary slot placeholders */
+     width: 50px;
+     height: 65px;
+     margin: 0 4px; /* Adjusted margin */
+     background: #e0e0e0; /* A slightly darker background for empty slots */
+     border-radius: 7px;
+     border: 2px dashed #a0a0a0; /* Distinct dashed border for empty slots */
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     font-size: 1.8rem;
+     color: #777; /* Text color for empty slots if needed, not used for icons */
+     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+     position: relative;
+     overflow: hidden; /* Ensure card content stays within bounds */
+   }
+   .temp-card { /* Style for cards placed in temp slots */
+     width: 100%;
+     height: 100%;
+     background: #fff;
+     border-radius: 7px;
+     border: 2px solid #c5e6b3; /* Solid border for active cards */
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     font-size: 1.8rem;
+     box-shadow: 0 2px 6px #b6e38880;
+     cursor: default;
+     position: absolute; /* Position within the slot */
+     transition: opacity 0.12s; /* SPEED UP */
+     box-sizing: border-box; /* Include padding and border in the element's total width and height */
+   }
+   .temp-card.matched {
+     opacity: 0.1;
+   }
+   /* --- New style for the animated "flying" card --- */
+   .flying-card {
+     width: 60px;
+     height: 80px;
+     background: #fff;
+     border-radius: 8px;
+     box-shadow: 0 2px 10px #c2d6b3b0, 2px 4px 16px #aaa4;
+     border: 2px solid #b6e388;
+     position: fixed; /* Use fixed positioning for viewport-relative animation */
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     font-size: 2.4rem;
+     user-select: none;
+     z-index: 999; /* Ensure it's on top of everything */
+     transition: top 0.2s ease-in-out, left 0.2s ease-in-out, transform 0.2s ease-in-out; /* FASTER DROP */
+     overflow: hidden;
+   }
+   #tools-bar {
+     margin: 14px auto 0 auto;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     gap: 16px;
+     width: 380px; /* Adjusted to accommodate the new button */
+     flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+   }
+   #tools-bar button {
+     padding: 7px 15px;
+     background: #e6f6d3;
+     border: 1.5px solid #b6e388;
+     border-radius: 7px;
+     font-size: 1rem;
+     color: #335c1d;
+     font-weight: bold;
+     cursor: pointer;
+     transition: background 0.10s; /* SPEED UP */
+     outline: none;
+     position: relative;
+     min-width: 68px;
+   }
+   #tools-bar button:disabled {
+     background: #f0f0f0;
+     color: #b0b0b0;
+     border-color: #d0d0d0;
+     cursor: not-allowed;
+   }
+   #restart-btn { /* Style for the new restart button */
+     background: #ffe0b3;
+     border-color: #ffcc80;
+     color: #96602c;
+   }
+   #restart-btn:hover {
+     background: #ffd599;
+   }
+   #code-bar {
+     margin: 10px auto 0 auto;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     gap: 6px;
+     width: 340px;
+   }
+   #code-bar input {
+     width: 110px;
+     padding: 5px 8px;
+     border-radius: 6px;
+     border: 1.5px solid #b6e388;
+     outline: none;
+     font-size: 1rem;
+     margin-right: 3px;
+   }
+   #code-bar button {
+     padding: 5px 8px;
+     font-size: 1rem;
+     background: #e6f6d3;
+     border: 1.5px solid #b6e388;
+     border-radius: 7px;
+     cursor: pointer;
+     color: #335c1d;
+     font-weight: bold;
+     transition: background 0.10s; /* SPEED UP */
+     min-width: 56px;
+   }
+   #message-bar {
+     margin: 10px auto 0 auto;
+     text-align: center;
+     font-size: 1.02rem;
+     color: #e65c4f;
+     min-height: 24px;
+     font-weight: bold;
+     letter-spacing: 1px;
+   }
+   #start-screen, #level-finish, #game-over {
+     position: absolute;
+     left: 0; right: 0; top: 0; bottom: 0;
+     z-index: 88;
+     background: rgba(255,255,255,0.92);
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     flex-direction: column;
+     font-size: 1.2rem;
+     border-radius: 18px;
+     text-align: center;
+   }
+   #start-screen h1 {
+     font-size: 2.3rem;
+     margin: 0 0 18px 0;
+     color: #6e352f;
+     font-family: 'Comic Sans MS', 'Segoe Print', cursive;
+     letter-spacing: 2px;
+     text-shadow: 1px 1px 0 #c5e6b3, 2px 2px 0 #b6e388;
+   }
+   #start-screen .start-btn {
+     margin-top: 20px;
+     padding: 12px 42px;
+     font-size: 1.3rem;
+     background: linear-gradient(90deg,#b6e388,#c5e6b3);
+     border: none;
+     border-radius: 11px;
+     color: #335c1d;
+     font-weight: bold;
+     cursor: pointer;
+     box-shadow: 0 2px 8px #b6e388;
+     transition: background 0.12s; /* SPEED UP */
+   }
+   #start-screen .start-btn:hover {
+     background: linear-gradient(90deg,#c5e6b3,#b6e388);
+   }
+   #level-finish, #game-over {
+     font-size: 1.7rem;
+     color: #335c1d;
+     background: rgba(255,255,255,0.97);
+     border-radius: 18px;
+   }
+   #level-finish button, #game-over button {
+     margin-top: 22px;
+     padding: 10px 28px;
+     font-size: 1.12rem;
+     background: #e6f6d3;
+     border: 1.5px solid #b6e388;
+     border-radius: 9px;
+     color: #335c1d;
+     font-weight: bold;
+     cursor: pointer;
+     transition: background 0.10s; /* SPEED UP */
+   }
+   #level-finish button:hover, #game-over button:hover {
+     background: #d2e5bb;
+   }
+   #retry-btn {
+     margin-top: 14px;
+     padding: 9px 24px;
+     font-size: 1.08rem;
+     background: #f5eac6;
+     border: 1.5px solid #e5d88a;
+     border-radius: 7px;
+     color: #6e352f;
+     font-weight: bold;
+     cursor: pointer;
+     transition: background 0.10s; /* SPEED UP */
+     display: inline-block;
+   }
+   #retry-btn:hover {
+     background: #f7f4de;
+   }
+   #footer {
+     margin: 16px auto 0 auto;
+     width: 100%;
+     text-align: center;
+     font-size: 0.98rem;
+     color: #558c25;
+     font-family: 'Comic Sans MS', 'Segoe Print', cursive;
+     letter-spacing: 1.4px;
+   }
 
-    /* --- Styles for Level 2 on ALL devices to reduce difficulty --- */
-    body.level-2-active .card {
-      width: 45px; /* Smaller card width for Level 2 */
-      height: 60px; /* Smaller card height for Level 2 */
-      font-size: 1.8rem; /* Adjusted font size for smaller cards */
-      border-width: 1.5px; /* Slightly thinner border for smaller cards */
-    }
-    body.level-2-active .flying-card {
-      width: 45px;
-      height: 60px;
-      font-size: 1.8rem;
-      border-width: 1.5px;
-    }
-    body.level-2-active .temp-slot {
-      width: 40px; /* Smaller temp slot to fit smaller cards */
-      height: 55px; /* Smaller temp slot height */
-      margin: 0 3px; /* Reduced margin between temp slots */
-      border-width: 1.5px;
-    }
-    body.level-2-active .temp-card {
-      font-size: 1.5rem; /* Adjusted font size for smaller temp cards */
-      border-width: 1.5px;
-    }
-    body.level-2-active #temp-area {
-      width: 330px;
-      min-height: 55px; /* Adjust min-height to fit smaller temp slots */
-      padding: 5px 0; /* Slightly reduced padding */
-    }
-    body.level-2-active #card-stack-area {
-      height: 260px; /* Slightly reduced height for stack area to match smaller cards */
-    }
-    /* --- End new styles --- */
+   /* --- Styles for Level 2 on ALL devices to reduce difficulty --- */
+   body.level-2-active .card {
+     width: 45px; /* Smaller card width for Level 2 */
+     height: 60px; /* Smaller card height for Level 2 */
+     font-size: 1.8rem; /* Adjusted font size for smaller cards */
+     border-width: 1.5px; /* Slightly thinner border for smaller cards */
+     transition: transform 0.05s, box-shadow 0.07s, opacity 0.12s; /* SPEED UP LV2 */
+   }
+   body.level-2-active .flying-card {
+     width: 45px;
+     height: 60px;
+     font-size: 1.8rem;
+     border-width: 1.5px;
+     transition: top 0.15s ease-in-out, left 0.15s ease-in-out, transform 0.15s ease-in-out; /* FASTER DROP LV2 */
+   }
+   body.level-2-active .temp-slot {
+     width: 40px; /* Smaller temp slot to fit smaller cards */
+     height: 55px; /* Smaller temp slot height */
+     margin: 0 3px; /* Reduced margin between temp slots */
+     border-width: 1.5px;
+   }
+   body.level-2-active .temp-card {
+     font-size: 1.5rem; /* Adjusted font size for smaller temp cards */
+     border-width: 1.5px;
+     transition: opacity 0.10s; /* SPEED UP LV2 */
+   }
+   body.level-2-active #temp-area {
+     width: 330px;
+     min-height: 55px; /* Adjust min-height to fit smaller temp slots */
+     padding: 5px 0; /* Slightly reduced padding */
+   }
+   body.level-2-active #card-stack-area {
+     height: 260px; /* Slightly reduced height for stack area to match smaller cards */
+   }
+   /* --- End new styles --- */
 
-    @media (max-width: 420px) {
-      #card-stack-area, #temp-area, #tools-bar, #code-bar { width: 98vw;}
-      #tools-bar button {
-          min-width: unset; /* Remove min-width constraint */
-          width: 30%; /* Distribute evenly */
-          margin-bottom: 8px; /* Add some spacing when wrapped */
-      }
-      #tools-bar {
-          gap: 8px; /* Reduce gap when wrapped */
-      }
-    }
-  </style>
+   @media (max-width: 420px) {
+     #card-stack-area, #temp-area, #tools-bar, #code-bar { width: 98vw;}
+     #tools-bar button {
+         min-width: unset; /* Remove min-width constraint */
+         width: 30%; /* Distribute evenly */
+         margin-bottom: 8px; /* Add some spacing when wrapped */
+     }
+     #tools-bar {
+         gap: 8px; /* Reduce gap when wrapped */
+     }
+   }
+ </style>
 </head>
 <body>
 <div id="game-container">
-  <div id="header-bar">
-    <div id="progress-info">关卡: 1 / 2 | 剩余卡牌: --</div>
-    <button id="music-toggle" title="音乐开关">🎵</button>
-  </div>
-  <div id="main-area">
-    <div id="card-stack-area"></div>
-    <div id="temp-area">
-      <div class="temp-slot"></div>
-      <div class="temp-slot"></div>
-      <div class="temp-slot"></div>
-      <div class="temp-slot"></div>
-      <div class="temp-slot"></div>
-      <div class="temp-slot"></div>
-      <div class="temp-slot"></div>
-    </div>
-    <div id="tools-bar">
-      <button id="undo-btn" disabled title="撤销(需兑换码)">↩️ 撤销 (<span id="undo-count">0</span>)</button>
-      <button id="hint-btn" disabled title="提示(需兑换码)">💡 提示 (<span id="hint-count">0</span>)</button>
-      <button id="shuffle-btn" disabled title="洗牌(需兑换码)">🔀 洗牌 (<span id="shuffle-count">0</span>)</button>
-      <button id="restart-btn" title="重新开始当前关卡">🔄 重新开始</button>
-    </div>
-    <div id="code-bar">
-      <input type="text" id="code-input" placeholder="兑换码" maxlength="12">
-      <button id="code-btn">兑换</button>
-    </div>
-    <div id="message-bar"></div>
-  </div>
-  <div id="start-screen">
-    <h1>猫了个猫 🐾</h1>
-    <div style="font-size:1.12rem;color:#335c1d;margin-bottom:10px;">
-      玩法：点击卡牌进行收集，3张相同自动消除，全部清空过关，暂存区只能放7张，超限失败。<br>
-      <span style="color:#f26b4b;">第二关难度飙升</span>，支持使用兑换码解锁道具。<br>
-      <span style="font-size:0.95rem;color:#666;">猫了个猫 &copy; 2025 | Designed by 开元</span>
-    </div>
-    <button class="start-btn" id="start-btn">开始游戏</button>
-  </div>
-  <div id="level-finish" style="display:none;">
-    <div id="level-finish-text"></div>
-    <button id="next-btn">下一关</button>
-    <button id="retry-btn" style="margin-left:10px;">重玩</button>
-  </div>
-  <div id="game-over" style="display:none;">
-    <div id="game-over-text"></div>
-    <button id="retry-btn2">重试</button>
-  </div>
-  <div id="footer">
-    Designed by 开元
-  </div>
+ <div id="header-bar">
+   <div id="progress-info">关卡: 1 / 2 | 剩余卡牌: --</div>
+   <button id="music-toggle" title="音乐开关">🎵</button>
+ </div>
+ <div id="main-area">
+   <div id="card-stack-area"></div>
+   <div id="temp-area">
+     <div class="temp-slot"></div>
+     <div class="temp-slot"></div>
+     <div class="temp-slot"></div>
+     <div class="temp-slot"></div>
+     <div class="temp-slot"></div>
+     <div class="temp-slot"></div>
+     <div class="temp-slot"></div>
+   </div>
+   <div id="tools-bar">
+     <button id="undo-btn" disabled title="撤销(需兑换码)">↩️ 撤销 (<span id="undo-count">0</span>)</button>
+     <button id="hint-btn" disabled title="提示(需兑换码)">💡 提示 (<span id="hint-count">0</span>)</button>
+     <button id="shuffle-btn" disabled title="洗牌(需兑换码)">🔀 洗牌 (<span id="shuffle-count">0</span>)</button>
+     <button id="restart-btn" title="重新开始当前关卡">🔄 重新开始</button>
+   </div>
+   <div id="code-bar">
+     <input type="text" id="code-input" placeholder="兑换码" maxlength="12">
+     <button id="code-btn">兑换</button>
+   </div>
+   <div id="message-bar"></div>
+ </div>
+ <div id="start-screen">
+   <h1>猫了个猫 🐾</h1>
+   <div style="font-size:1.12rem;color:#335c1d;margin-bottom:10px;">
+     玩法：点击卡牌进行收集，3张相同自动消除，全部清空过关，暂存区只能放7张，超限失败。<br>
+     <span style="color:#f26b4b;">第二关难度飙升</span>，支持使用兑换码解锁道具。<br>
+     <span style="font-size:0.95rem;color:#666;">猫了个猫 &copy; 2025 | Designed by 开元</span>
+   </div>
+   <button class="start-btn" id="start-btn">开始游戏</button>
+ </div>
+ <div id="level-finish" style="display:none;">
+   <div id="level-finish-text"></div>
+   <button id="next-btn">下一关</button>
+   <button id="retry-btn" style="margin-left:10px;">重玩</button>
+ </div>
+ <div id="game-over" style="display:none;">
+   <div id="game-over-text"></div>
+   <button id="retry-btn2">重试</button>
+ </div>
+ <div id="footer">
+   Designed by 开元
+ </div>
 </div>
 <audio id="bgm" src="PVZ.mp3" loop preload="auto"></audio>
-<audio id="click-sound" src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_4db8813353.mp3?filename=pop-1-105307.mp3" preload="auto"></audio>
+<audio id="click-sound" src="PVZ.mp3" preload="auto"></audio>
 
 <script>
 const CARD_ICONS = [
-  "🐱", "🐶", "🐻", "🐼", "🦊", "🐵", "🦁", "🐸", "🐧", "🐨",
-  "🍉", "🍓", "🥗", "🍇", "🍊", "🍎", "🍒", "🍋", "🥝",
-  "🌽", "🥕", "🍆", "🥑", "🥦", "🍄"
+ "🐱", "🐶", "🐻", "🐼", "🦊", "🐵", "🦁", "🐸", "🐧", "🐨",
+ "🍉", "🍓", "🍇", "🍊", "🍎", "🍒", "🍋", "🥝"
 ];
 const LEVELS = [
-  {num: 1, visible: 18, total: 21, stack: 1, rows: 3, cols: 6, overlap: 30},
-  {num: 2, visible: 90, total: 150, stack: 2, rows: 7, cols: 9, overlap: 22}
+ {num: 1, visible: 18, total: 21, stack: 1, rows: 3, cols: 6, overlap: 30},
+ {num: 2, visible: 90, total: 150, stack: 2, rows: 7, cols: 9, overlap: 22}
 ];
 const TEMP_LIMIT = 7;
 const CODE = "kaiyuan";
@@ -462,470 +464,22 @@ const bgm = document.getElementById('bgm');
 const clickSound = document.getElementById('click-sound');
 
 let game = {
-  level: 1,
-  cards: [],
-  board: [],
-  temp: [],
-  matched: [],
-  usedIcons: [],
-  toolUses: {undo: 0, hint: 0, shuffle: 0},
-  progress: 0,
-  stepStack: [],
-  bgmOn: true,
-  lock: false
+ level: 1,
+ cards: [],
+ board: [],
+ temp: [],
+ matched: [],
+ usedIcons: [],
+ toolUses: {undo: 0, hint: 0, shuffle: 0},
+ progress: 0,
+ stepStack: [],
+ bgmOn: true,
+ lock: false
 };
 
 function randArr(arr) {
-  return arr.slice().sort(()=>Math.random()-0.5);
+ return arr.slice().sort(()=>Math.random()-0.5);
 }
 function shuffle(arr) {
-  for(let i=arr.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
-  }
-  return arr;
-}
-function deepClone(obj){
-  return JSON.parse(JSON.stringify(obj));
-}
-
-// --- Corrected Audio Functions ---
-function playBgm(on) {
-  if (!bgm) return;
-  if (on) {
-    const playPromise = bgm.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(error => {
-        console.error("BGM autoplay was prevented:", error);
-        // If play fails, update the state and UI to reflect that music is off.
-        game.bgmOn = false;
-        document.getElementById('music-toggle').innerHTML = '⏸️';
-      });
-    }
-  } else {
-    bgm.pause();
-  }
-}
-
-function playClickSound() {
-  if (game.bgmOn && clickSound) {
-    clickSound.volume = 0.2; // Set a reasonable volume for the click
-    clickSound.currentTime = 0; // Rewind to the start
-    clickSound.play().catch(e => console.error("Click sound failed:", e));
-  }
-}
-
-// 随机混乱紧凑堆叠
-function genLevel(levelIdx){
-  const lv = LEVELS[levelIdx-1];
-  let iconsNeeded = Math.ceil(lv.total/3);
-  let icons = randArr(CARD_ICONS).slice(0,iconsNeeded);
-  
-  // 1. Create a perfectly balanced set of logical cards
-  let cards = [];
-  for(let i=0;i<lv.total;i++){
-    cards.push({
-      id: i,
-      icon: icons[i%icons.length],
-      matched: false
-    });
-  }
-  shuffle(cards);
-
-  // 2. Place ALL logical cards onto the physical board
-  let board = [];
-  let areaW = document.getElementById('card-stack-area').offsetWidth;
-  let areaH = document.getElementById('card-stack-area').offsetHeight;
-
-  let cardW = 60;
-  let cardH = 80;
-  if (levelIdx === 2) {
-    cardW = 45;
-    cardH = 60;
-  }
-  let stackDepth = lv.stack;
-
-  // --- BUG FIX STARTS HERE ---
-  // The original loop used random numbers, causing an incorrect total number of cards to be placed.
-  // This new loop iterates through all cards deterministically, ensuring board.length === lv.total.
-  for (let cardIdx = 0; cardIdx < lv.total; cardIdx++) {
-    // Determine which stack layer the card belongs to, ensuring even distribution
-    const s = Math.floor(cardIdx / (lv.total / stackDepth));
-    
-    // Position the card randomly within the area
-    let maxTry = 30, tryCount = 0, ok = false, x = 0, y = 0;
-    while (tryCount < maxTry && !ok) {
-      x = randBetween(5, areaW - cardW - 5) + randBetween(-5, 5) * (s / 2);
-      y = randBetween(5, areaH - cardH - 5) + randBetween(-5, 5) * (s / 2);
-      ok = true;
-      tryCount++;
-    }
-    
-    // Determine z-index based on stack layer and position within the layer
-    const z = s * 100 + (cardIdx % Math.floor(lv.total / stackDepth));
-    
-    board.push({
-      id: cards[cardIdx].id,
-      icon: cards[cardIdx].icon,
-      x, y, z,
-      matched: false,
-      covered: false,
-      stack: s
-    });
-  }
-  // --- BUG FIX ENDS HERE ---
-  
-  // 3. Calculate which cards are covered
-  for(let i=0; i<board.length; i++){
-    let ci = board[i];
-    ci.coveredBy = [];
-    for(let j=0; j<board.length; j++){
-      if(i === j) continue;
-      let cj = board[j];
-      // A card is covered if another card is in a higher stack (s) and overlaps it
-      if(cj.stack > ci.stack && Math.abs(cj.x - ci.x) < cardW * 0.6 && Math.abs(cj.y - ci.y) < cardH * 0.6){
-        ci.coveredBy.push(cj.id);
-      }
-    }
-  }
-  
-  return {cards, board, usedIcons:icons};
-}
-function randBetween(a,b){ return a + Math.random()*(b-a); }
-function isCardClickable(card, board){
-  if(card.matched) return false;
-  let self = board.find(c=>c.id===card.id);
-  return self.coveredBy.every(cid=>{
-    let c = board.find(cc=>cc.id===cid);
-    return c && c.matched;
-  });
-}
-function renderBoard(){
-  const area = document.getElementById('card-stack-area');
-  area.innerHTML = '';
-  let cards = game.board;
-  cards.forEach(card=>{
-    let el = document.createElement('div');
-    el.className = "card"+(card.matched?" matched":"")+(isCardClickable(card,game.board)?"":" disabled");
-    el.style.left = card.x+'px';
-    el.style.top = card.y+'px';
-    el.style.zIndex = card.z+(card.matched?-20:0);
-    el.innerHTML = card.icon;
-    el.dataset.id = card.id; // Add data-id for easier selection
-    if(!card.matched && isCardClickable(card,game.board)){
-      el.onclick = ()=>clickCard(card.id);
-    }
-    area.appendChild(el);
-  });
-}
-function renderTemp(){
-  const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
-  tempSlots.forEach((slot, i) => {
-    slot.innerHTML = '';
-    if (i < game.temp.length) {
-      const c = game.temp[i];
-      let el = document.createElement('div');
-      el.className = "temp-card" + (c.matched ? " matched" : "");
-      el.innerHTML = c.icon;
-      slot.appendChild(el);
-    }
-  });
-}
-function renderProgress(){
-  const info = document.getElementById('progress-info');
-  const lv = LEVELS[game.level-1];
-  let left = game.board.filter(c=>!c.matched).length;
-  info.textContent = `关卡: ${game.level} / 2 | 剩余卡牌: ${left}`;
-}
-function showMessage(msg, color){
-  let bar = document.getElementById('message-bar');
-  bar.style.color = color||'#e65c4f';
-  bar.textContent = msg||'';
-  if(msg) setTimeout(()=>{bar.textContent='';}, 2300);
-}
-
-function clickCard(id) {
-  if (game.lock) return;
-  let cardDataIndex = game.board.findIndex(c => c.id === id);
-  if (cardDataIndex === -1 || game.board[cardDataIndex].matched) return;
-  if (!isCardClickable(game.board[cardDataIndex], game.board)) return;
-  if (game.temp.length >= TEMP_LIMIT) {
-    setTimeout(() => gameOver('暂存区已超限，游戏失败！'), 100);
-    return;
-  }
-
-  game.lock = true;
-  saveStep();
-
-  const cardData = game.board[cardDataIndex];
-  const clickedCardEl = document.querySelector(`#card-stack-area .card[data-id='${id}']`);
-
-  if (!clickedCardEl) {
-    game.lock = false;
-    return;
-  }
-
-  // --- Animation Start ---
-  const startRect = clickedCardEl.getBoundingClientRect();
-  const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
-
-  // Find where the new card will be placed after sorting
-  const tempWithNewCard = [...game.temp, { icon: cardData.icon, id: cardData.id }];
-  tempWithNewCard.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
-  const endSlotIndex = tempWithNewCard.findIndex(c => c.id === id);
-  const endRect = tempSlots[endSlotIndex].getBoundingClientRect();
-
-  const flyingCard = document.createElement('div');
-  flyingCard.className = 'flying-card';
-  flyingCard.innerHTML = cardData.icon;
-  document.body.appendChild(flyingCard);
-
-  flyingCard.style.left = `${startRect.left}px`;
-  flyingCard.style.top = `${startRect.top}px`;
-
-  clickedCardEl.style.opacity = '0';
-  clickedCardEl.style.pointerEvents = 'none';
-
-  requestAnimationFrame(() => {
-    const tempSlotStyle = window.getComputedStyle(tempSlots[endSlotIndex]);
-    const flyingCardFinalWidth = parseFloat(tempSlotStyle.width) * 0.9;
-    const flyingCardFinalHeight = parseFloat(tempSlotStyle.height) * 0.9;
-
-    const destLeft = endRect.left + (endRect.width - flyingCardFinalWidth) / 2;
-    const destTop = endRect.top + (endRect.height - flyingCardFinalHeight) / 2;
-
-    flyingCard.style.left = `${destLeft}px`;
-    flyingCard.style.top = `${destTop}px`;
-    flyingCard.style.transform = `scale(${flyingCardFinalWidth / startRect.width})`;
-  });
-
-  setTimeout(() => {
-    document.body.removeChild(flyingCard);
-    // --- Animation End ---
-
-    // --- Original Logic Resumes ---
-    cardData.matched = true;
-    game.temp.push({ icon: cardData.icon, id: cardData.id, matched: false });
-    game.temp.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
-    renderTemp();
-    playClickSound();
-
-    let iconCnt = {};
-    game.temp.forEach(c => {
-      if (!c.matched) iconCnt[c.icon] = (iconCnt[c.icon] || 0) + 1;
-    });
-
-    let matchedIcon = Object.keys(iconCnt).find(k => iconCnt[k] === 3);
-
-    if (matchedIcon) {
-      game.temp.forEach(c => { if (c.icon === matchedIcon) c.matched = true; });
-      setTimeout(() => {
-        game.temp = game.temp.filter(c => !c.matched);
-        renderTemp();
-        renderBoard();
-        checkWin();
-        game.lock = false; // Unlock after match animation
-      }, 330);
-    } else {
-      renderBoard(); // Update clickable state of other cards
-      if (game.temp.length >= TEMP_LIMIT) {
-        setTimeout(() => gameOver('暂存区已超限，游戏失败！'), 100);
-      } else {
-        game.lock = false; // Unlock if no match and not game over
-      }
-    }
-    renderProgress();
-  }, 350); // This must match the CSS transition duration
-}
-
-function checkWin(){
-  if(game.board.every(c=>c.matched)){
-    setTimeout(()=>{
-      if(game.level===1){
-        showLevelFinish('恭喜！第一关通关！');
-      }else{
-        showLevelFinish('全部通关！你太棒啦！');
-      }
-    },330);
-  }
-}
-function updateToolButtons() {
-  document.getElementById('undo-count').textContent = game.toolUses.undo;
-  document.getElementById('hint-count').textContent = game.toolUses.hint;
-  document.getElementById('shuffle-count').textContent = game.toolUses.shuffle;
-  document.getElementById('undo-btn').disabled = game.toolUses.undo <= 0;
-  document.getElementById('hint-btn').disabled = game.toolUses.hint <= 0;
-  document.getElementById('shuffle-btn').disabled = game.toolUses.shuffle <= 0;
-}
-document.getElementById('undo-btn').onclick = function(){
-  if(game.toolUses.undo > 0){
-    undoStep();
-    game.toolUses.undo--;
-    updateToolButtons();
-  }
-};
-document.getElementById('hint-btn').onclick = function(){
-  if(game.toolUses.hint > 0){
-    hintStep();
-    game.toolUses.hint--;
-    updateToolButtons();
-  }
-};
-document.getElementById('shuffle-btn').onclick = function(){
-  if(game.toolUses.shuffle > 0){
-    shuffleStep();
-    game.toolUses.shuffle--;
-    updateToolButtons();
-  }
-};
-document.getElementById('restart-btn').onclick = function() {
-    if (confirm('确定要重新开始当前关卡吗？所有道具使用次数将重置。')) {
-        startGame(game.level);
-        showMessage('关卡已重新开始！', '#335c1d');
-    }
-};
-function saveStep(){
-  game.stepStack.push({
-    board: deepClone(game.board),
-    temp: deepClone(game.temp)
-  });
-  if(game.stepStack.length>20) game.stepStack.shift();
-}
-function undoStep(){
-  if(game.stepStack.length>0){
-    let prev = game.stepStack.pop();
-    game.board = deepClone(prev.board);
-    game.temp = deepClone(prev.temp);
-    renderAll();
-    showMessage('已撤销');
-  } else {
-    showMessage('无法撤销更多', '#888');
-  }
-}
-function shuffleStep(){
-  let unmatched = game.board.filter(c=>!c.matched);
-  let icons = unmatched.map(c=>c.icon);
-  shuffle(icons);
-  unmatched.forEach((c,i)=>c.icon=icons[i]);
-  renderAll();
-  showMessage('已洗牌');
-}
-function hintStep(){
-  let cnt = {};
-  let all = game.temp.concat(game.board.filter(c=>!c.matched && isCardClickable(c,game.board)).map(c=>({icon:c.icon,id:c.id})));
-  all.forEach(c=>cnt[c.icon]=cnt[c.icon]?cnt[c.icon]+1:1);
-  let target = null;
-  for(let k in cnt){ if(cnt[k]>=3){ target=k;break; } }
-  if(target){
-    let hintDone = 0;
-    const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
-    for(let i=0;i<game.temp.length;i++){
-      if(game.temp[i].icon===target && !game.temp[i].matched && hintDone<3) {
-        const tempCardElement = tempSlots[i].querySelector('.temp-card');
-        if (tempCardElement) {
-            tempCardElement.style.borderColor = '#f26b4b';
-            hintDone++;
-        }
-      }
-    }
-    for(let i=0;i<game.board.length && hintDone<3;i++){
-      if(!game.board[i].matched && game.board[i].icon===target && isCardClickable(game.board[i],game.board)){
-        let doms = document.querySelectorAll('#card-stack-area .card');
-        for(let j=0;j<doms.length;j++){
-          if(Math.abs(parseFloat(doms[j].style.left) - game.board[i].x) < 2 &&
-             Math.abs(parseFloat(doms[j].style.top) - game.board[i].y) < 2){
-            doms[j].style.borderColor='#f26b4b'; doms[j].style.boxShadow='0 0 16px #fe9e7a';
-            hintDone++;
-            break;
-          }
-        }
-      }
-    }
-    showMessage('已高亮可消除三张');
-    setTimeout(renderAll,1700);
-  } else {
-    showMessage('当前无可三消', "#888");
-  }
-}
-document.getElementById('code-btn').onclick=function(){
-  let val = document.getElementById('code-input').value.trim().toLowerCase();
-  if(val===CODE){
-    game.toolUses.undo += TOOL_GRANT_COUNT;
-    game.toolUses.hint += TOOL_GRANT_COUNT;
-    game.toolUses.shuffle += TOOL_GRANT_COUNT;
-    showMessage(`兑换成功，道具已解锁！各增加 ${TOOL_GRANT_COUNT} 次使用机会！`, "#335c1d");
-    updateToolButtons();
-  }else{
-    showMessage('兑换码错误', "#e65c4f");
-  }
-  document.getElementById('code-input').value='';
-};
-document.getElementById('music-toggle').onclick=function(){
-  game.bgmOn = !game.bgmOn;
-  this.innerHTML = game.bgmOn?'⏸️':'▶️';
-  playBgm(game.bgmOn);
-};
-document.getElementById('start-btn').onclick = function(){
-  document.getElementById('start-screen').style.display='none';
-  startGame(1);
-};
-document.getElementById('next-btn').onclick = function(){
-  document.getElementById('level-finish').style.display='none';
-  startGame(2);
-};
-document.getElementById('retry-btn').onclick = function(){
-  document.getElementById('level-finish').style.display='none';
-  startGame(game.level);
-};
-document.getElementById('retry-btn2').onclick = function(){
-  document.getElementById('game-over').style.display='none';
-  startGame(game.level);
-};
-function showLevelFinish(msg){
-  document.getElementById('level-finish').style.display='flex';
-  document.getElementById('level-finish-text').innerHTML=msg;
-  document.getElementById('next-btn').style.display = (game.level===1)?'inline-block':'none';
-}
-function gameOver(msg){
-  game.lock=true;
-  setTimeout(()=>{
-    document.getElementById('game-over').style.display='flex';
-    document.getElementById('game-over-text').innerHTML=msg;
-  },330);
-}
-function startGame(level){
-  game.level=level;
-  if (level === 2) {
-    document.body.classList.add('level-2-active');
-  } else {
-    document.body.classList.remove('level-2-active');
-  }
-
-  let lv = genLevel(level);
-  game.cards = lv.cards;
-  game.board = lv.board;
-  game.usedIcons = lv.usedIcons;
-  game.temp = [];
-  game.matched = [];
-  game.toolUses = {undo: 0, hint: 0, shuffle: 0};
-  game.stepStack = [];
-  game.lock = false;
-  renderAll();
-  updateToolButtons();
-  playBgm(game.bgmOn);
-}
-function renderAll(){
-  renderBoard();
-  renderTemp();
-  renderProgress();
-  updateToolButtons();
-}
-// --- Corrected onload behavior ---
-window.onload=function(){
-  // Do not play BGM on load, wait for user interaction.
-  document.getElementById('music-toggle').innerHTML = game.bgmOn?'⏸️':'▶️';
-  updateToolButtons(); // Initial update of tool buttons
-}
-</script>
-</body>
-</html>
+ for(let i=arr.length-1;i>0;i--){
+   const j = Math.floor(Math.random()*(i+1));
