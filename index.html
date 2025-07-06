@@ -822,12 +822,20 @@ function clickCard(id) {
   // --- Animation Start ---
   const startRect = clickedCardEl.getBoundingClientRect();
   
-  // Temporarily add card to temp array to determine its final position
-  // Use the actual game.temp after the pre-check
-  const tempForPosition = [...game.temp, { icon: cardData.icon, id: cardData.id }];
-  tempForPosition.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
-  const endSlotIndex = tempForPosition.findIndex(c => c.id === id);
+  // MODIFIED: Calculate the correct end slot for the flying card
+  // Temporarily add the card to a *copy* of temp array and sort it
+  // to find its future index for animation destination.
+  const tempForPositionCalculation = [...game.temp, { icon: cardData.icon, id: cardData.id }];
+  tempForPositionCalculation.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
+  const endSlotIndex = tempForPositionCalculation.findIndex(c => c.id === id);
+
   const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
+  // Ensure the endSlotIndex is valid before trying to access tempSlots[endSlotIndex]
+  if (endSlotIndex < 0 || endSlotIndex >= tempSlots.length) {
+      console.error("Invalid end slot index calculated. Aborting card animation.");
+      game.lock = false;
+      return;
+  }
   const endRect = tempSlots[endSlotIndex].getBoundingClientRect();
 
   const flyingCard = document.createElement('div');
@@ -858,7 +866,7 @@ function clickCard(id) {
     document.body.removeChild(flyingCard);
     // --- Animation End ---
 
-    // --- Original Logic Resumes ---
+    // --- Original Logic Resumes (now actual game state modification) ---
     cardData.matched = true; // Mark the card on the board as matched
     game.temp.push({ icon: cardData.icon, id: cardData.id, matched: false });
     game.temp.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
