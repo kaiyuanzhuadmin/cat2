@@ -5,51 +5,74 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <title>喵了个咪</title>
   <style>
+    /* New Chinese-style fonts */
+    @font-face {
+        font-family: 'HanyiSentyLotus';
+        src: url('https://fonts.cdnfonts.com/s/72921/hanyisentyjilian.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+    }
+    @font-face {
+        font-family: 'FangSong';
+        src: local('FangSong'), local('方正仿宋简体'), local('FZFSJW');
+        font-weight: normal;
+        font-style: normal;
+    }
+
     body {
       margin: 0;
-      font-family: 'Segoe UI', 'PingFang SC', 'Helvetica Neue', Arial, 'Microsoft Yahei', sans-serif;
-      background: #b6e388 url('https://img.zcool.cn/community/01e3f05c2c1e7ea801214168e1e7e2.jpg') no-repeat center center fixed;
+      background: #f7f0e8 url('https://img.zcool.cn/community/01540a5a3a0e37a801201217e57d07.jpg@1280w_1l_2o_100sh.jpg') no-repeat center center fixed;
       background-size: cover;
       min-height: 100vh;
       overflow-x: hidden;
-      color: #333;
+      font-family: 'FangSong', 'Segoe UI', 'PingFang SC', 'Helvetica Neue', Arial, 'Microsoft Yahei', sans-serif;
+      color: #3e2723;
     }
     #game-container {
-      /* Increased max-width for desktop, allowing more cards */
-      max-width: 600px; /* ORIGINAL: 480px */
-      margin: 24px auto 0 auto;
-      background: rgba(255,255,255,0.92);
-      border-radius: 18px;
-      box-shadow: 0 2px 16px #7db36a60;
-      padding: 0 0 24px 0;
+      max-width: 650px;
+      margin: 30px auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 25px;
+      box-shadow: 0 5px 25px rgba(100, 60, 40, 0.3);
+      padding: 0 0 20px 0;
       position: relative;
-      /* Increased min-height to accommodate larger display */
-      min-height: 850px; /* ORIGINAL: 700px */
+      min-height: 880px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      border: 3px solid #8B4513;
     }
-    @media (max-width: 650px) { /* Adjusted breakpoint to match new max-width */
-      #game-container { max-width: 100vw; box-shadow: none; border-radius: 0; min-height: 95vh;}
+    @media (max-width: 700px) {
+      #game-container { max-width: 100vw; margin: 0; box-shadow: none; border-radius: 0; min-height: 100vh; border: none;}
     }
     #header-bar {
       width: 100%;
-      padding: 12px 20px 0 20px;
+      padding: 15px 25px 0 25px;
       box-sizing: border-box;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0));
+      border-top-left-radius: 22px;
+      border-top-right-radius: 22px;
     }
     #progress-info {
-      font-size: 1rem;
+      font-size: 1.15rem;
       font-weight: bold;
+      color: #5d4037;
+      text-shadow: 0.5px 0.5px 0 rgba(255,255,255,0.7);
     }
     #music-toggle {
       background: none;
       border: none;
       outline: none;
-      font-size: 1.6rem;
+      font-size: 1.8rem;
       cursor: pointer;
+      color: #6d4c41;
+      transition: transform 0.2s ease-in-out;
+    }
+    #music-toggle:hover {
+      transform: scale(1.1);
     }
     #main-area {
       flex:1;
@@ -60,59 +83,56 @@
       justify-content: flex-start;
     }
     #card-stack-area {
-      margin-top: 10px;
-      /* Increased width and height significantly to display more cards */
-      width: 550px; /* ORIGINAL: 400px */
-      height: 450px; /* ORIGINAL: 300px */
+      margin-top: 20px;
+      width: 580px;
+      height: 500px;
       position: relative;
-      background: rgba(255,255,255,0.10);
-      border-radius: 10px;
-      box-shadow: 0 2px 6px #d8ecd8cc;
+      background: rgba(240, 230, 210, 0.6);
+      border-radius: 15px;
+      box-shadow: inset 0 2px 10px rgba(100, 60, 40, 0.15), 0 5px 15px rgba(100, 60, 40, 0.2);
       overflow: visible;
       display: flex;
       align-items: center;
       justify-content: center;
+      border: 2px dashed #b8860b;
     }
-    @media (max-width: 600px) { /* Adjusted breakpoint for mobile */
+    @media (max-width: 650px) {
       #card-stack-area {
-        width: 96vw; /* Adjusted for mobile */
-        min-width: 220px;
-        height: 380px; /* Adjusted height for mobile */
+        width: 96vw;
+        min-width: 250px;
+        height: 420px;
       }
     }
-    /* Default card size */
     .card {
-      width: 60px; /* Adjusted card width */
-      height: 80px; /* Adjusted card height */
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px #c2d6b3b0, 2px 4px 16px #aaa4;
-      border: 2px solid #b6e388;
+      width: 65px;
+      height: 85px;
+      background: #fffdf7;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(255,255,255,0.5);
+      border: 3px solid #d4a762;
       position: absolute;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.4rem; /* Slightly larger icon */
+      font-size: 2.6rem;
       cursor: pointer;
       user-select: none;
-      transition: transform 0.10s, box-shadow 0.13s, opacity 0.3s;
+      transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, opacity 0.3s, border-color 0.15s;
       z-index: 1;
       overflow: hidden;
+      color: #5d4037;
     }
     .card.selected {
-      border: 2.5px solid #558c25;
-      box-shadow: 0 2px 18px #b6e388;
+      border: 3.5px solid #a0522d;
+      box-shadow: 0 4px 20px rgba(160, 82, 45, 0.4), 0 0 25px rgba(255,255,0,0.5);
       z-index: 100 !important;
-      transform: scale(1.08) rotate(-3deg);
+      transform: scale(1.1) rotate(-2deg);
     }
 
-    /* MODIFIED: Gray overlay for disabled cards */
     .card.disabled {
-      /* Keep existing pointer-events: none */
       pointer-events: none;
-      position: absolute; /* Ensure positioning for pseudo-element */
+      position: absolute;
     }
-
     .card.disabled::before {
       content: '';
       position: absolute;
@@ -120,130 +140,134 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(128, 128, 128, 0.4); /* Gray with 40% opacity */
-      border-radius: 8px; /* Match card border-radius */
-      z-index: 2; /* Ensure it's above the card content */
-      transition: background 0.3s ease; /* Smooth transition for overlay */
+      background: rgba(128, 128, 128, 0.3);
+      border-radius: 8px;
+      z-index: 2;
+      transition: background 0.3s ease;
     }
-
-    /* You might want to slightly reduce the icon opacity too for consistency */
     .card.disabled {
-        opacity: 1; /* Reset opacity on the card itself */
+        opacity: 1;
     }
     .card.disabled > *:not(.disabled::before) {
-        opacity: 0.6; /* Apply opacity to content (icon) */
+        opacity: 0.5;
     }
-    /* END MODIFIED */
-
     .card.matched {
-      opacity: 0.1;
-      transition: opacity 0.23s;
+      opacity: 0.05;
+      transition: opacity 0.25s;
       pointer-events: none;
     }
     .card .mini {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       position: absolute;
-      bottom: 6px;
-      right: 8px;
-      opacity: 0.45;
+      bottom: 7px;
+      right: 9px;
+      opacity: 0.5;
     }
     #temp-area {
-      margin: 14px auto 0 auto;
+      margin: 20px auto 0 auto;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 68px;
-      /* Adjusted width to fit 7 slots + margins, for potentially larger cards if needed */
-      width: 450px; /* ORIGINAL: 380px */
-      border-radius: 8px;
-      background: #f7f7f7;
-      border: 1.5px dashed #b6e388;
-      padding: 7px 0;
+      min-height: 80px;
+      width: 500px;
+      border-radius: 12px;
+      background: #fffcf0;
+      border: 2px dashed #b8860b;
+      padding: 8px 0;
       box-sizing: border-box;
+      box-shadow: inset 0 1px 5px rgba(0,0,0,0.08);
     }
-    .temp-slot { /* New style for the temporary slot placeholders */
-      width: 58px; /* Slightly larger temp slot */
-      height: 75px; /* Slightly larger temp slot */
-      margin: 0 5px; /* Adjusted margin */
-      background: #e0e0e0; /* A slightly darker background for empty slots */
-      border-radius: 7px;
-      border: 2px dashed #a0a0a0; /* Distinct dashed border for empty slots */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      color: #777; /* Text color for empty slots if needed, not used for icons */
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      position: relative;
-      overflow: hidden; /* Ensure card content stays within bounds */
-    }
-    .temp-card { /* Style for cards placed in temp slots */
-      width: 100%;
-      height: 100%;
-      background: #fff;
-      border-radius: 7px;
-      border: 2px solid #c5e6b3; /* Solid border for active cards */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem; /* Slightly larger font for temp cards */
-      box-shadow: 0 2px 6px #b6e38880;
-      cursor: default;
-      position: absolute; /* Position within the slot */
-      transition: opacity 0.18s;
-      box-sizing: border-box; /* Include padding and border in the element's total width and height */
-    }
-    .temp-card.matched {
-      opacity: 0.1;
-    }
-    /* --- New style for the animated "flying" card --- */
-    .flying-card {
-      width: 60px;
+    .temp-slot {
+      width: 63px;
       height: 80px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px #c2d6b3b0, 2px 4px 16px #aaa4;
-      border: 2px solid #b6e388;
-      position: fixed; /* Use fixed positioning for viewport-relative animation */
+      margin: 0 6px;
+      background: #fdf5e6;
+      border-radius: 9px;
+      border: 2px dashed #d4a762;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.4rem;
-      user-select: none;
-      z-index: 999; /* Ensure it's on top of everything */
-      transition: top 0.35s ease-in-out, left 0.35s ease-in-out, transform 0.35s ease-in-out;
+      font-size: 2rem;
+      color: #92776c;
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
+      position: relative;
       overflow: hidden;
     }
-    #tools-bar {
-      margin: 14px auto 0 auto;
+    .temp-card {
+      width: 100%;
+      height: 100%;
+      background: #fffdf7;
+      border-radius: 9px;
+      border: 2.5px solid #a0522d;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 16px;
-      width: 450px; /* Adjusted to accommodate the new button and maintain layout */
-      flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+      font-size: 2.2rem;
+      box-shadow: 0 2px 8px rgba(160, 82, 45, 0.3);
+      cursor: default;
+      position: absolute;
+      transition: opacity 0.2s, border-color 0.2s, box-shadow 0.2s;
+      box-sizing: border-box;
+      color: #5d4037;
+    }
+    .temp-card.matched {
+      opacity: 0.05;
+    }
+    .flying-card {
+      width: 65px;
+      height: 85px;
+      background: #fffdf7;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(255,255,255,0.5);
+      border: 3px solid #d4a762;
+      position: fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.6rem;
+      user-select: none;
+      z-index: 999;
+      transition: top 0.35s ease-in-out, left 0.35s ease-in-out, transform 0.35s ease-in-out;
+      overflow: hidden;
+      color: #5d4037;
+    }
+    #tools-bar {
+      margin: 20px auto 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      width: 500px;
+      flex-wrap: wrap;
     }
     #tools-bar button {
-      padding: 7px 15px;
-      background: #e6f6d3;
-      border: 1.5px solid #b6e388;
-      border-radius: 7px;
-      font-size: 1rem;
-      color: #335c1d;
+      padding: 9px 18px;
+      background: #f7e9d7;
+      border: 2px solid #b8860b;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      color: #6e352f;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.13s;
+      transition: background 0.15s, transform 0.1s;
       outline: none;
       position: relative;
-      min-width: 68px;
+      min-width: 75px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    #tools-bar button:hover {
+      background: #e9d9c6;
+      transform: translateY(-1px);
     }
     #tools-bar button:disabled {
       background: #f0f0f0;
       color: #b0b0b0;
       border-color: #d0d0d0;
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
-    #restart-btn { /* Style for the new restart button */
+    #restart-btn {
       background: #ffe0b3;
       border-color: #ffcc80;
       color: #96602c;
@@ -252,196 +276,288 @@
       background: #ffd599;
     }
     #code-bar {
-      margin: 10px auto 0 auto;
+      margin: 15px auto 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      width: 400px; /* Adjusted width */
+      gap: 8px;
+      width: 450px;
     }
     #code-bar input {
-      width: 140px; /* Slightly wider input */
-      padding: 5px 8px;
-      border-radius: 6px;
-      border: 1.5px solid #b6e388;
+      width: 180px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 2px solid #b8860b;
       outline: none;
-      font-size: 1rem;
-      margin-right: 3px;
+      font-size: 1.05rem;
+      color: #5d4037;
+      background: #fffdf7;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    }
+    #code-bar input::placeholder {
+      color: #a0a0a0;
     }
     #code-bar button {
-      padding: 5px 8px;
-      font-size: 1rem;
+      padding: 7px 12px;
+      font-size: 1.05rem;
       background: #e6f6d3;
-      border: 1.5px solid #b6e388;
-      border-radius: 7px;
+      border: 2px solid #a0c388;
+      border-radius: 9px;
       cursor: pointer;
-      color: #335c1d;
+      color: #3e5a2b;
       font-weight: bold;
-      transition: background 0.13s;
-      min-width: 56px;
+      transition: background 0.15s;
+      min-width: 65px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    #code-bar button:hover {
+      background: #d2e5bb;
     }
     #message-bar {
-      margin: 10px auto 0 auto;
+      margin: 15px auto 0 auto;
       text-align: center;
-      font-size: 1.02rem;
-      color: #e65c4f;
-      min-height: 24px;
+      font-size: 1.1rem;
+      color: #c0392b;
+      min-height: 28px;
       font-weight: bold;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
     }
     #start-screen, #level-finish, #game-over {
       position: absolute;
       left: 0; right: 0; top: 0; bottom: 0;
       z-index: 88;
-      background: rgba(255,255,255,0.92);
+      background: rgba(255,255,255,0.98);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      font-size: 1.2rem;
-      border-radius: 18px;
+      font-size: 1.3rem;
+      border-radius: 25px;
       text-align: center;
     }
     #start-screen h1 {
-      font-size: 2.3rem;
-      margin: 0 0 18px 0;
-      color: #6e352f;
-      font-family: 'Comic Sans MS', 'Segoe Print', cursive;
-      letter-spacing: 2px;
-      text-shadow: 1px 1px 0 #c5e6b3, 2px 2px 0 #b6e388;
+      font-size: 3.2rem;
+      margin: 0 0 25px 0;
+      color: #8B4513;
+      font-family: 'HanyiSentyLotus', 'Comic Sans MS', cursive;
+      letter-spacing: 3px;
+      text-shadow: 2px 2px 0 #f7e9d7, 4px 4px 0 #b8860b;
     }
     #start-screen .start-btn {
-      margin-top: 20px;
-      padding: 12px 42px;
-      font-size: 1.3rem;
-      background: linear-gradient(90deg,#b6e388,#c5e6b3);
+      margin-top: 30px;
+      padding: 15px 50px;
+      font-size: 1.4rem;
+      background: linear-gradient(90deg, #a0c388, #88b368);
       border: none;
-      border-radius: 11px;
-      color: #335c1d;
+      border-radius: 15px;
+      color: #3e5a2b;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 2px 8px #b6e388;
-      transition: background 0.15s;
+      box-shadow: 0 4px 15px rgba(160, 195, 136, 0.5);
+      transition: background 0.2s, transform 0.1s;
     }
     #start-screen .start-btn:hover {
-      background: linear-gradient(90deg,#c5e6b3,#b6e388);
+      background: linear-gradient(90deg, #88b368, #a0c388);
+      transform: translateY(-2px);
+    }
+    #start-screen p {
+        color: #5d4037;
+        line-height: 1.6;
+        margin: 0 40px 15px;
+    }
+    #start-screen span {
+        color: #c0392b;
+        font-weight: bold;
+    }
+    #start-screen small {
+        color: #795548;
+        font-size: 0.85rem;
+        margin-top: 30px;
     }
     #level-finish, #game-over {
-      font-size: 1.7rem;
-      color: #335c1d;
-      background: rgba(255,255,255,0.97);
-      border-radius: 18px;
+      font-size: 2rem;
+      color: #5d4037;
+      background: rgba(255,255,255,0.99);
+      border-radius: 25px;
     }
     #level-finish button, #game-over button {
-      margin-top: 22px;
-      padding: 10px 28px;
-      font-size: 1.12rem;
+      margin-top: 25px;
+      padding: 12px 35px;
+      font-size: 1.25rem;
       background: #e6f6d3;
-      border: 1.5px solid #b6e388;
-      border-radius: 9px;
-      color: #335c1d;
+      border: 2px solid #a0c388;
+      border-radius: 12px;
+      color: #3e5a2b;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.13s;
+      transition: background 0.15s, transform 0.1s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     #level-finish button:hover, #game-over button:hover {
       background: #d2e5bb;
+      transform: translateY(-1px);
     }
     #retry-btn {
-      margin-top: 14px;
-      padding: 9px 24px;
-      font-size: 1.08rem;
-      background: #f5eac6;
-      border: 1.5px solid #e5d88a;
-      border-radius: 7px;
+      margin-top: 18px;
+      padding: 10px 30px;
+      font-size: 1.15rem;
+      background: #f7e9d7;
+      border: 2px solid #d4a762;
+      border-radius: 10px;
       color: #6e352f;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.13s;
+      transition: background 0.15s, transform 0.1s;
       display: inline-block;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.1);
     }
     #retry-btn:hover {
-      background: #f7f4de;
+      background: #f0e1d0;
+      transform: translateY(-1px);
     }
     #footer {
-      margin: 16px auto 0 auto;
+      margin: 20px auto 0 auto;
       width: 100%;
       text-align: center;
-      font-size: 0.98rem;
-      color: #558c25;
-      font-family: 'Comic Sans MS', 'Segoe Print', cursive;
-      letter-spacing: 1.4px;
+      font-size: 1rem;
+      color: #8B4513;
+      font-family: 'FangSong', 'Comic Sans MS', cursive;
+      letter-spacing: 1.5px;
+      text-shadow: 0.5px 0.5px 0 rgba(255,255,255,0.5);
     }
 
     /* --- Styles for Level 2 on ALL devices to reduce difficulty --- */
     body.level-2-active .card {
-      width: 45px; /* Smaller card width for Level 2 */
-      height: 60px; /* Smaller card height for Level 2 */
-      font-size: 1.8rem; /* Adjusted font size for smaller cards */
-      border-width: 1.5px; /* Slightly thinner border for smaller cards */
+      width: 50px;
+      height: 65px;
+      font-size: 2rem;
+      border-width: 2px;
+      border-radius: 8px;
     }
     body.level-2-active .flying-card {
-      width: 45px;
-      height: 60px;
-      font-size: 1.8rem;
-      border-width: 1.5px;
+      width: 50px;
+      height: 65px;
+      font-size: 2rem;
+      border-width: 2px;
+      border-radius: 8px;
     }
     body.level-2-active .temp-slot {
-      width: 40px; /* Smaller temp slot to fit smaller cards */
-      height: 55px; /* Smaller temp slot height */
-      margin: 0 3px; /* Reduced margin between temp slots */
+      width: 45px;
+      height: 60px;
+      margin: 0 4px;
       border-width: 1.5px;
+      border-radius: 7px;
     }
     body.level-2-active .temp-card {
-      font-size: 1.5rem; /* Adjusted font size for smaller temp cards */
+      font-size: 1.8rem;
       border-width: 1.5px;
+      border-radius: 7px;
     }
     body.level-2-active #temp-area {
-      width: 330px;
-      min-height: 55px; /* Adjust min-height to fit smaller temp slots */
-      padding: 5px 0; /* Slightly reduced padding */
+      width: 380px;
+      min-height: 65px;
+      padding: 6px 0;
     }
     body.level-2-active #card-stack-area {
-      height: 380px; /* Adjust for level 2 smaller cards */
+      height: 420px;
     }
     /* --- End new styles --- */
 
-    @media (max-width: 480px) { /* Adjusted breakpoint for more aggressive mobile adjustments */
-      #card-stack-area, #temp-area, #tools-bar, #code-bar { width: 98vw;}
+    /* --- Custom Confirm Modal Styles --- */
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6);
+        /* 修复问题：增加z-index值确保模态框在最上层 */
+        z-index: 2500; /* 原值为1000 */
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-content {
+        background: #fffdf7;
+        padding: 30px 40px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        border: 3px solid #d4a762;
+    }
+    .modal-content p {
+        font-size: 1.2rem;
+        color: #5d4037;
+        margin: 0 0 25px 0;
+        font-weight: bold;
+    }
+    .modal-content button {
+        padding: 9px 25px;
+        background: #f7e9d7;
+        border: 2px solid #b8860b;
+        border-radius: 10px;
+        font-size: 1.05rem;
+        color: #6e352f;
+        font-weight: bold;
+        cursor: pointer;
+        margin: 0 10px;
+        transition: background 0.15s, transform 0.1s;
+    }
+    .modal-content button:hover {
+        transform: translateY(-1px);
+    }
+    #confirm-yes {
+        background: #e6f6d3;
+        border-color: #a0c388;
+        color: #3e5a2b;
+    }
+    #confirm-yes:hover {
+        background: #d2e5bb;
+    }
+    #confirm-no:hover {
+        background: #e9d9c6;
+    }
+    /* --- End Modal Styles --- */
+
+
+    @media (max-width: 500px) {
+      #card-stack-area, #temp-area, #tools-bar, #code-bar { width: 98vw; }
       #tools-bar button {
-          min-width: unset; /* Remove min-width constraint */
-          width: 30%; /* Distribute evenly */
-          margin-bottom: 8px; /* Add some spacing when wrapped */
+          min-width: unset;
+          width: 30%;
+          margin-bottom: 8px;
+          padding: 8px 10px;
+          font-size: 0.95rem;
       }
       #tools-bar {
-          gap: 8px; /* Reduce gap when wrapped */
+          gap: 6px;
       }
       #temp-area {
-        width: 98vw; /* Ensure temp area scales on very small screens */
-        margin: 14px auto 0 auto; /* Re-center */
+        width: 98vw;
+        margin: 15px auto 0 auto;
       }
       .temp-slot {
-        width: 12vw; /* Use percentage width for flexibility on smaller screens */
-        height: 15vw; /* Maintain aspect ratio */
-        margin: 0 1vw; /* Adjusted margin for smaller screens */
+        width: 12vw;
+        height: 16vw;
+        margin: 0 0.8vw;
       }
       .temp-card {
-        font-size: 6vw; /* Scale font size with viewport width */
+        font-size: 6vw;
       }
       .card {
-        width: 14vw; /* Scale card size with viewport width for level 1 */
-        height: 18vw;
+        width: 15vw;
+        height: 20vw;
         font-size: 8vw;
       }
       body.level-2-active .card {
-        width: 10vw; /* Scale card size with viewport width for level 2 */
-        height: 13vw;
-        font-size: 5vw;
+        width: 12vw;
+        height: 16vw;
+        font-size: 6vw;
       }
       body.level-2-active .temp-slot {
-        width: 10vw;
-        height: 13vw;
-        margin: 0 1vw;
+        width: 11vw;
+        height: 15vw;
+        margin: 0 0.8vw;
+      }
+      #code-bar input {
+        width: 50%;
       }
     }
   </style>
@@ -477,12 +593,12 @@
   </div>
   <div id="start-screen">
     <h1>喵了个咪 🐾</h1>
-    <div style="font-size:1.12rem;color:#335c1d;margin-bottom:10px;">
+    <p>
       点击卡牌进行收集，3张相同自动消除，全部清空过关，暂存区只能放7张，超限失败。<br>
-      <span style="color:#f26b4b;">第二关难度飙升</span>，支持使用兑换码解锁道具。<br>
-      <span style="font-size:0.95rem;color:#666;">喵了个咪 &copy; 2025 | Designed by 开元</span>
-    </div>
+      <span style="color:#c0392b;">第二关难度飙升</span>，支持使用兑换码解锁道具。
+    </p>
     <button class="start-btn" id="start-btn">开始游戏</button>
+    <small>喵了个咪 &copy; 2025 | Designed by 开元</small>
   </div>
   <div id="level-finish" style="display:none;">
     <div id="level-finish-text"></div>
@@ -494,16 +610,29 @@
     <button id="retry-btn2">重试</button>
   </div>
   <div id="footer">
-    喵了个咪 &copy; 2025 | Designed by 开元
+      喵了个咪 &copy; 2025 | Designed by 开元
   </div>
 </div>
+
+<!-- Custom Confirm Modal -->
+<div id="confirm-modal" class="modal-overlay">
+  <div class="modal-content">
+    <p id="confirm-msg">你确定吗？</p>
+    <div class="modal-buttons">
+        <button id="confirm-yes">确定</button>
+        <button id="confirm-no">取消</button>
+    </div>
+  </div>
+</div>
+
+
 <audio id="bgm" src="PVZ.mp3" loop preload="auto"></audio>
 <audio id="click-sound" src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_4db8813353.mp3?filename=pop-1-105307.mp3" preload="auto"></audio>
 
 <script>
 const CARD_ICONS = [
   "🐈", "🀄️", "🧩", "🪆", "🏵️", "🧸", "🍬", "🔮", "🎡", "🪙", "🐩", "🪭",
-  "🐖", "🧶", "🪮", "✂️" // Added 4 new icons, totaling 16
+  "🐖", "🧶", "🪮", "✂️"
 ];
 const LEVELS = [
   {num: 1, visible: 18, total: 21, stack: 1, rows: 3, cols: 6, overlap: 30},
@@ -513,9 +642,15 @@ const TEMP_LIMIT = 7;
 const CODE = "kaiyuan";
 const TOOL_GRANT_COUNT = 3;
 
-// --- Get Audio elements once ---
 const bgm = document.getElementById('bgm');
 const clickSound = document.getElementById('click-sound');
+const confirmModal = document.getElementById('confirm-modal');
+const confirmMsg = document.getElementById('confirm-msg');
+const confirmYes = document.getElementById('confirm-yes');
+const confirmNo = document.getElementById('confirm-no');
+const footer = document.getElementById('footer');
+
+let confirmCallback = null;
 
 let game = {
   level: 1,
@@ -544,8 +679,8 @@ function shuffle(arr) {
 function deepClone(obj){
   return JSON.parse(JSON.stringify(obj));
 }
+function randBetween(a,b){ return a + Math.random()*(b-a); }
 
-// --- Corrected Audio Functions ---
 function playBgm(on) {
   if (!bgm) return;
   if (on) {
@@ -553,9 +688,8 @@ function playBgm(on) {
     if (playPromise !== undefined) {
       playPromise.catch(error => {
         console.error("BGM autoplay was prevented:", error);
-        // If play fails, update the state and UI to reflect that music is off.
         game.bgmOn = false;
-        document.getElementById('music-toggle').innerHTML = '⏸️';
+        document.getElementById('music-toggle').innerHTML = '▶️';
       });
     }
   } else {
@@ -565,51 +699,61 @@ function playBgm(on) {
 
 function playClickSound() {
   if (game.bgmOn && clickSound) {
-    clickSound.volume = 0.2; // Set a reasonable volume for the click
-    clickSound.currentTime = 0; // Rewind to the start
+    clickSound.volume = 0.2;
+    clickSound.currentTime = 0;
     clickSound.play().catch(e => console.error("Click sound failed:", e));
   }
 }
 
-// 随机混乱紧凑堆叠
+function showConfirm(msg, callback) {
+  confirmMsg.textContent = msg;
+  confirmCallback = callback;
+  confirmModal.style.display = 'flex';
+}
+
+function hideConfirm() {
+  confirmModal.style.display = 'none';
+  confirmCallback = null;
+}
+
+confirmYes.onclick = () => {
+  const callback = confirmCallback;
+  hideConfirm();
+  if (callback) {
+    setTimeout(callback, 20);
+  }
+};
+
+confirmNo.onclick = hideConfirm;
+
 function genLevel(levelIdx){
   const lv = LEVELS[levelIdx-1];
   
-  // 1. Generate icons ensuring each appears a multiple of 3 times
   let allIcons = [];
-  // Ensure enough unique icons for the level's total cards / 3
   const requiredUniqueIcons = Math.ceil(lv.total / 3);
-  let availableIcons = randArr(CARD_ICONS); // Shuffle available icons
-  // If not enough unique icons is available for the total number of cards,
-  // we might run into an issue. For now, assume CARD_ICONS is sufficient.
-  availableIcons = availableIcons.slice(0, Math.min(availableIcons.length, requiredUniqueIcons + 2)); // Use a few extra to ensure variety
+  let availableIcons = randArr(CARD_ICONS); 
+  availableIcons = availableIcons.slice(0, Math.min(availableIcons.length, requiredUniqueIcons + 2)); 
 
   let iconPool = [];
-  // Populate iconPool with required number of each icon
   for (let i = 0; i < requiredUniqueIcons; i++) {
-    for (let j = 0; j < 3; j++) { // Each icon appears at least 3 times
+    for (let j = 0; j < 3; j++) {
       iconPool.push(availableIcons[i % availableIcons.length]);
     }
   }
-  // Fill the rest of the total cards, ensuring multiples of 3
   while (iconPool.length < lv.total) {
       const remaining = lv.total - iconPool.length;
       if (remaining < 3) {
-          // Add enough from the available icons to make up to a multiple of 3
-          // This ensures the total number of icons remains a multiple of 3
           for (let i = 0; i < remaining; i++) {
               iconPool.push(availableIcons[i % availableIcons.length]);
           }
       } else {
-          // Add 3 of an icon
           const iconToAdd = availableIcons[Math.floor(Math.random() * availableIcons.length)];
           iconPool.push(iconToAdd, iconToAdd, iconToAdd);
       }
   }
-  shuffle(iconPool); // Shuffle the icons for random distribution
+  shuffle(iconPool);
   allIcons = iconPool;
 
-  // 2. Create logical cards with unique IDs
   let cards = [];
   for(let i = 0; i < lv.total; i++){
     cards.push({
@@ -619,46 +763,37 @@ function genLevel(levelIdx){
     });
   }
 
-  // 3. Place ALL logical cards onto the physical board
   let board = [];
   const areaW = document.getElementById('card-stack-area').offsetWidth;
   const areaH = document.getElementById('card-stack-area').offsetHeight;
 
-  let cardW = (levelIdx === 2) ? 45 : 60;
-  let cardH = (levelIdx === 2) ? 60 : 80;
+  let cardW = (levelIdx === 2) ? 50 : 65;
+  let cardH = (levelIdx === 2) ? 65 : 85;
   let stackDepth = lv.stack;
 
-  // Max number of cards per stack layer
   const cardsPerStackLayer = Math.ceil(lv.total / stackDepth);
 
   for (let cardIdx = 0; cardIdx < lv.total; cardIdx++) {
-    // Determine which stack layer the card belongs to
     const s = Math.min(Math.floor(cardIdx / cardsPerStackLayer), stackDepth - 1);
     
     let x = 0, y = 0;
-    // Attempt to find a suitable position to avoid too much overlap
-    let maxAttempts = 50; // Increased attempts for better distribution
+    let maxAttempts = 50;
     let foundPosition = false;
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       let tempX = randBetween(5, areaW - cardW - 5);
       let tempY = randBetween(5, areaH - cardH - 5);
       
-      // Add slight offset based on stack layer to create a "pile" effect
       tempX += (s * 5 * (Math.random() - 0.5));
       tempY += (s * 5 * (Math.random() - 0.5));
 
-      // Ensure positions are within bounds after offset
       tempX = Math.max(5, Math.min(tempX, areaW - cardW - 5));
       tempY = Math.max(5, Math.min(tempY, areaH - cardH - 5));
 
-      // Check for overlap with existing cards in the same or lower stack
       let overlap = false;
       for (const existingCard of board) {
-        // Only consider overlap with cards in the same or lower stack layers
         if (existingCard.stack <= s) {
           const dx = Math.abs(tempX - existingCard.x);
           const dy = Math.abs(tempY - existingCard.y);
-          // Define a relaxed overlap threshold
           if (dx < cardW * 0.7 && dy < cardH * 0.7) {
             overlap = true;
             break;
@@ -674,40 +809,31 @@ function genLevel(levelIdx){
       }
     }
     
-    // If no suitable position found after attempts, just place it.
-    // This is a fallback and ideally should not be hit often with increased attempts.
     if (!foundPosition) {
         x = randBetween(5, areaW - cardW - 5);
         y = randBetween(5, areaH - cardH - 5);
     }
 
-    // Determine z-index based on stack layer and order within the layer
-    // Higher stack means higher z-index. Within a layer, later cards are higher.
-    const z = s * 1000 + cardIdx; // Increased multiplier for better separation
+    const z = s * 1000 + cardIdx;
 
     board.push({
       id: cards[cardIdx].id,
       icon: cards[cardIdx].icon,
       x, y, z,
       matched: false,
-      covered: false, // This property is not strictly used later, but kept for consistency
-      stack: s // Store the stack layer
+      covered: false,
+      stack: s
     });
   }
   
-  // Sort board by z-index for correct rendering order
   board.sort((a, b) => a.z - b.z);
 
-  // 4. Calculate which cards are covered
   for(let i = 0; i < board.length; i++){
     let ci = board[i];
     ci.coveredBy = [];
     for(let j = 0; j < board.length; j++){
       if(i === j) continue;
       let cj = board[j];
-      // A card `ci` is covered by `cj` if `cj` is above `ci` (higher z-index)
-      // and their bounding boxes significantly overlap.
-      // Adjust overlap threshold based on card size
       const overlapThresholdX = cardW * 0.6;
       const overlapThresholdY = cardH * 0.6;
 
@@ -723,88 +849,29 @@ function genLevel(levelIdx){
   return {cards, board, usedIcons: availableIcons.slice(0, Math.ceil(lv.total/3))};
 }
 
-function randBetween(a,b){ return a + Math.random()*(b-a); }
-
-// Modified isCardClickable to correctly use `coveredBy` array
 function isCardClickable(card, board){
   if(card.matched) return false;
   let self = board.find(c=>c.id===card.id);
-  if (!self) return false; // Card might not be found if already removed/matched
+  if (!self) return false;
   
-  // A card is clickable if no card that *covers it* is still unmatched.
-  // We need to check if all cards listed in `self.coveredBy` are `matched`.
   return self.coveredBy.every(cid=>{
     let coveringCard = board.find(cc=>cc.id===cid);
-    return coveringCard && coveringCard.matched; // If covering card exists, it must be matched
+    return coveringCard && coveringCard.matched;
   });
-}
-
-function renderBoard(){
-  const area = document.getElementById('card-stack-area');
-  area.innerHTML = '';
-  let cardsToRender = game.board.filter(c => !c.matched); // Only render unmatched cards
-  
-  // Sort cards by z-index for correct display order (higher z-index on top)
-  cardsToRender.sort((a, b) => a.z - b.z); 
-
-  cardsToRender.forEach(card=>{
-    let el = document.createElement('div');
-    // Determine if the card is currently clickable
-    const clickable = isCardClickable(card, game.board);
-    el.className = "card" + (clickable ? "" : " disabled");
-    el.style.left = card.x+'px';
-    el.style.top = card.y+'px';
-    el.style.zIndex = card.z; // Use the calculated z-index
-    el.innerHTML = card.icon;
-    el.dataset.id = card.id; // Add data-id for easier selection
-    
-    if(clickable){
-      el.onclick = ()=>clickCard(card.id);
-    }
-    area.appendChild(el);
-  });
-}
-function renderTemp(){
-  const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
-  tempSlots.forEach((slot, i) => {
-    slot.innerHTML = '';
-    if (i < game.temp.length) {
-      const c = game.temp[i];
-      let el = document.createElement('div');
-      el.className = "temp-card" + (c.matched ? " matched" : "");
-      el.innerHTML = c.icon;
-      slot.appendChild(el);
-    }
-  });
-}
-function renderProgress(){
-  const info = document.getElementById('progress-info');
-  const lv = LEVELS[game.level-1];
-  let left = game.board.filter(c=>!c.matched).length;
-  info.textContent = `关卡: ${game.level} / 2 | 剩余卡牌: ${left}`;
-}
-function showMessage(msg, color){
-  let bar = document.getElementById('message-bar');
-  bar.style.color = color||'#e65c4f';
-  bar.textContent = msg||'';
-  if(msg) setTimeout(()=>{bar.textContent='';}, 2300);
 }
 
 function clickCard(id) {
   if (game.lock) return;
-  let cardData = game.board.find(c => c.id === id); // Find the card data
+  let cardData = game.board.find(c => c.id === id);
   
   if (!cardData || cardData.matched || !isCardClickable(cardData, game.board)) return;
   
-  // Pre-check for game over BEFORE starting animation or adding to temp
   let tempCheck = [...game.temp, { icon: cardData.icon, id: cardData.id }];
   let iconCntCheck = {};
   tempCheck.forEach(c => iconCntCheck[c.icon] = (iconCntCheck[c.icon] || 0) + 1);
   let matchedIconCheck = Object.keys(iconCntCheck).find(k => iconCntCheck[k] === 3);
 
   if (game.temp.length >= TEMP_LIMIT && !matchedIconCheck) {
-      // If temp area is full AND no immediate match possible with this card, it's game over.
-      // Call gameOver directly here without processing the card further.
       gameOver('暂存区已超限，游戏失败！');
       return;
   }
@@ -819,18 +886,13 @@ function clickCard(id) {
     return;
   }
 
-  // --- Animation Start ---
   const startRect = clickedCardEl.getBoundingClientRect();
   
-  // MODIFIED: Calculate the correct end slot for the flying card
-  // Temporarily add the card to a *copy* of temp array and sort it
-  // to find its future index for animation destination.
   const tempForPositionCalculation = [...game.temp, { icon: cardData.icon, id: cardData.id }];
   tempForPositionCalculation.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
   const endSlotIndex = tempForPositionCalculation.findIndex(c => c.id === id);
 
   const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
-  // Ensure the endSlotIndex is valid before trying to access tempSlots[endSlotIndex]
   if (endSlotIndex < 0 || endSlotIndex >= tempSlots.length) {
       console.error("Invalid end slot index calculated. Aborting card animation.");
       game.lock = false;
@@ -864,10 +926,8 @@ function clickCard(id) {
 
   setTimeout(() => {
     document.body.removeChild(flyingCard);
-    // --- Animation End ---
-
-    // --- Original Logic Resumes (now actual game state modification) ---
-    cardData.matched = true; // Mark the card on the board as matched
+    
+    cardData.matched = true;
     game.temp.push({ icon: cardData.icon, id: cardData.id, matched: false });
     game.temp.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
     renderTemp();
@@ -885,20 +945,17 @@ function clickCard(id) {
       setTimeout(() => {
         game.temp = game.temp.filter(c => !c.matched);
         renderTemp();
-        renderBoard(); // Re-render board to update clickable states
+        renderBoard();
         checkWin();
-        game.lock = false; // Unlock after match animation
+        game.lock = false;
       }, 330);
     } else {
-      renderBoard(); // Update clickable state of other cards
-      // The game over check for full temp area is now done BEFORE the card is processed.
-      // So, if we reach here, either there's room, or there's a match.
-      game.lock = false; // Unlock if no match and not game over
+      renderBoard();
+      game.lock = false;
     }
     renderProgress();
-  }, 350); // This must match the CSS transition duration
+  }, 350);
 }
-
 
 function checkWin(){
   if(game.board.every(c=>c.matched)){
@@ -906,48 +963,12 @@ function checkWin(){
       if(game.level===1){
         showLevelFinish('恭喜！第一关通关！');
       }else{
-        showLevelFinish('🐷全部通关！你太棒啦🍭！');
+        showLevelFinish('🎉 恭喜您！所有关卡全部通关！你太棒啦！🎉');
       }
     },330);
   }
 }
-function updateToolButtons() {
-  document.getElementById('undo-count').textContent = game.toolUses.undo;
-  document.getElementById('hint-count').textContent = game.toolUses.hint;
-  document.getElementById('shuffle-count').textContent = game.toolUses.shuffle;
-  document.getElementById('undo-btn').disabled = game.toolUses.undo <= 0;
-  document.getElementById('hint-btn').disabled = game.toolUses.hint <= 0;
-  document.getElementById('shuffle-btn').disabled = game.toolUses.shuffle <= 0;
-}
-document.getElementById('undo-btn').onclick = function(){
-  if(game.toolUses.undo > 0 && game.stepStack.length > 0){
-    undoStep();
-    game.toolUses.undo--;
-    updateToolButtons();
-  } else if (game.toolUses.undo > 0 && game.stepStack.length === 0) {
-    showMessage('无法撤销更多', '#888');
-  }
-};
-document.getElementById('hint-btn').onclick = function(){
-  if(game.toolUses.hint > 0){
-    hintStep();
-    game.toolUses.hint--;
-    updateToolButtons();
-  }
-};
-document.getElementById('shuffle-btn').onclick = function(){
-  if(game.toolUses.shuffle > 0){
-    shuffleStep();
-    game.toolUses.shuffle--;
-    updateToolButtons();
-  }
-};
-document.getElementById('restart-btn').onclick = function() {
-    if (confirm('确定要重新开始当前关卡吗？所有道具使用次数将重置。')) {
-        startGame(game.level);
-        showMessage('关卡已重新开始！', '#335c1d');
-    }
-};
+
 function saveStep(){
   game.stepStack.push({
     board: deepClone(game.board),
@@ -969,16 +990,11 @@ function undoStep(){
 function shuffleStep(){
   let unmatched = game.board.filter(c=>!c.matched);
   let icons = unmatched.map(c=>c.icon);
-  shuffle(icons); // Shuffle the icons
+  shuffle(icons);
   
-  // Reassign icons to unmatched cards while maintaining their positions
   unmatched.forEach((c,i)=>{
       c.icon = icons[i];
   });
-
-  // Re-evaluate coveredBy after shuffle, as icon doesn't affect coverage
-  // (though the original shuffle didn't change positions, so this might be redundant for this specific shuffle)
-  // For now, simply re-rendering should suffice as only icons changed.
   renderAll();
   showMessage('已洗牌');
 }
@@ -1007,37 +1023,167 @@ function hintStep(){
     let hintDone = 0;
     const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
 
-    // Hint cards in the temporary area
     for (let i = 0; i < game.temp.length && hintDone < 3; i++) {
       if (game.temp[i].icon === targetIcon && !game.temp[i].matched) {
         const tempCardElement = tempSlots[i].querySelector('.temp-card');
         if (tempCardElement) {
-          tempCardElement.style.borderColor = '#f26b4b';
-          tempCardElement.style.boxShadow = '0 0 16px #fe9e7a';
+          tempCardElement.style.borderColor = '#e65c4f';
+          tempCardElement.style.boxShadow = '0 0 16px #ff8c69';
           hintDone++;
         }
       }
     }
 
-    // Hint clickable cards on the board
     for (let i = 0; i < clickableBoardCards.length && hintDone < 3; i++) {
       let boardCard = clickableBoardCards[i];
       if (boardCard.icon === targetIcon) {
         let doms = document.querySelector(`#card-stack-area .card[data-id='${boardCard.id}']`);
         if (doms) {
-          doms.style.borderColor = '#f26b4b';
-          doms.style.boxShadow = '0 0 16px #fe9e7a';
+          doms.style.borderColor = '#e65c4f';
+          doms.style.boxShadow = '0 0 16px #ff8c69';
           hintDone++;
         }
       }
     }
     
     showMessage('已高亮可消除三张');
-    setTimeout(renderAll, 1700); // Clear highlight after some time
+    setTimeout(renderAll, 1700);
   } else {
     showMessage('当前无可三消', "#888");
   }
 }
+
+function gameOver(msg){
+  game.lock=true;
+  document.getElementById('card-stack-area').innerHTML = '';
+  document.querySelectorAll('#temp-area .temp-slot').forEach(slot => slot.innerHTML = '');
+  document.getElementById('progress-info').textContent = '';
+  document.getElementById('message-bar').textContent = '';
+
+  setTimeout(()=>{
+    document.getElementById('game-over').style.display='flex';
+    document.getElementById('game-over-text').innerHTML=msg;
+  },100);
+}
+
+function startGame(level){
+  footer.style.display = 'block';
+
+  game.level=level;
+  if (level === 2) {
+    document.body.classList.add('level-2-active');
+  } else {
+    document.body.classList.remove('level-2-active');
+  }
+
+  let lv = genLevel(level);
+  game.cards = lv.cards;
+  game.board = lv.board;
+  game.usedIcons = lv.usedIcons;
+  game.temp = [];
+  game.matched = [];
+  game.toolUses = {undo: 0, hint: 0, shuffle: 0};
+  game.stepStack = [];
+  game.lock = false;
+  renderAll();
+  updateToolButtons();
+  playBgm(game.bgmOn);
+}
+
+function renderBoard(){
+  const area = document.getElementById('card-stack-area');
+  area.innerHTML = '';
+  let cardsToRender = game.board.filter(c => !c.matched);
+  
+  cardsToRender.sort((a, b) => a.z - b.z); 
+
+  cardsToRender.forEach(card=>{
+    let el = document.createElement('div');
+    const clickable = isCardClickable(card, game.board);
+    el.className = "card" + (clickable ? "" : " disabled");
+    el.style.left = card.x+'px';
+    el.style.top = card.y+'px';
+    el.style.zIndex = card.z;
+    el.innerHTML = card.icon;
+    el.dataset.id = card.id;
+    
+    if(clickable){
+      el.onclick = ()=>clickCard(card.id);
+    }
+    area.appendChild(el);
+  });
+}
+function renderTemp(){
+  const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
+  tempSlots.forEach((slot, i) => {
+    slot.innerHTML = '';
+    if (i < game.temp.length) {
+      const c = game.temp[i];
+      let el = document.createElement('div');
+      el.className = "temp-card" + (c.matched ? " matched" : "");
+      el.innerHTML = c.icon;
+      slot.appendChild(el);
+    }
+  });
+}
+function renderProgress(){
+  const info = document.getElementById('progress-info');
+  let left = game.board.filter(c=>!c.matched).length;
+  info.textContent = `关卡: ${game.level} / 2 | 剩余卡牌: ${left}`;
+}
+function showMessage(msg, color){
+  let bar = document.getElementById('message-bar');
+  bar.style.color = color||'#c0392b';
+  bar.textContent = msg||'';
+  if(msg) setTimeout(()=>{bar.textContent='';}, 2300);
+}
+function updateToolButtons() {
+  document.getElementById('undo-count').textContent = game.toolUses.undo;
+  document.getElementById('hint-count').textContent = game.toolUses.hint;
+  document.getElementById('shuffle-count').textContent = game.toolUses.shuffle;
+  document.getElementById('undo-btn').disabled = game.toolUses.undo <= 0;
+  document.getElementById('hint-btn').disabled = game.toolUses.hint <= 0;
+  document.getElementById('shuffle-btn').disabled = game.toolUses.shuffle <= 0;
+}
+function renderAll(){
+  renderBoard();
+  renderTemp();
+  renderProgress();
+  updateToolButtons();
+}
+
+document.getElementById('undo-btn').onclick = function(){
+  if(game.toolUses.undo > 0 && game.stepStack.length > 0){
+    undoStep();
+    game.toolUses.undo--;
+    updateToolButtons();
+  } else if (game.toolUses.undo > 0 && game.stepStack.length === 0) {
+    showMessage('无法撤销更多', '#888');
+  }
+};
+document.getElementById('hint-btn').onclick = function(){
+  if(game.toolUses.hint > 0){
+    hintStep();
+    game.toolUses.hint--;
+    updateToolButtons();
+  }
+};
+document.getElementById('shuffle-btn').onclick = function(){
+  if(game.toolUses.shuffle > 0){
+    shuffleStep();
+    game.toolUses.shuffle--;
+    updateToolButtons();
+  }
+};
+
+document.getElementById('restart-btn').onclick = function() {
+    showConfirm('确定要重新开始当前关卡吗？所有道具使用次数将重置。', () => {
+        startGame(game.level);
+        setTimeout(() => {
+            showMessage('关卡已重新开始！', '#3e5a2b');
+        }, 50);
+    });
+};
 
 document.getElementById('code-btn').onclick=function(){
   let val = document.getElementById('code-input').value.trim().toLowerCase();
@@ -1045,16 +1191,16 @@ document.getElementById('code-btn').onclick=function(){
     game.toolUses.undo += TOOL_GRANT_COUNT;
     game.toolUses.hint += TOOL_GRANT_COUNT;
     game.toolUses.shuffle += TOOL_GRANT_COUNT;
-    showMessage(`兑换成功，道具已解锁！各增加 ${TOOL_GRANT_COUNT} 次使用机会！`, "#335c1d");
+    showMessage(`兑换成功，道具已解锁！各增加 ${TOOL_GRANT_COUNT} 次使用机会！`, "#3e5a2b");
     updateToolButtons();
   }else{
-    showMessage('兑换码错误', "#e65c4f");
+    showMessage('兑换码错误', "#c0392b");
   }
   document.getElementById('code-input').value='';
 };
 document.getElementById('music-toggle').onclick=function(){
   game.bgmOn = !game.bgmOn;
-  this.innerHTML = game.bgmOn?'⏸️':'▶️';
+  this.innerHTML = game.bgmOn?'🎵':'⏸️';
   playBgm(game.bgmOn);
 };
 document.getElementById('start-btn').onclick = function(){
@@ -1079,53 +1225,10 @@ function showLevelFinish(msg){
   document.getElementById('next-btn').style.display = (game.level===1)?'inline-block':'none';
 }
 
-// MODIFIED gameOver function
-function gameOver(msg){
-  game.lock=true;
-  // Clear the board and temp area to only show the game over screen
-  document.getElementById('card-stack-area').innerHTML = '';
-  document.querySelectorAll('#temp-area .temp-slot').forEach(slot => slot.innerHTML = '');
-  document.getElementById('progress-info').textContent = ''; // Clear progress info
-  document.getElementById('message-bar').textContent = ''; // Clear any other messages
-
-  setTimeout(()=>{
-    document.getElementById('game-over').style.display='flex';
-    document.getElementById('game-over-text').innerHTML=msg;
-  },100); // A small delay to ensure any ongoing animation finishes visually
-}
-
-function startGame(level){
-  game.level=level;
-  if (level === 2) {
-    document.body.classList.add('level-2-active');
-  } else {
-    document.body.classList.remove('level-2-active');
-  }
-
-  let lv = genLevel(level);
-  game.cards = lv.cards;
-  game.board = lv.board;
-  game.usedIcons = lv.usedIcons;
-  game.temp = [];
-  game.matched = [];
-  game.toolUses = {undo: 0, hint: 0, shuffle: 0}; // Reset tools on new game/restart
-  game.stepStack = [];
-  game.lock = false;
-  renderAll();
-  updateToolButtons();
-  playBgm(game.bgmOn);
-}
-function renderAll(){
-  renderBoard();
-  renderTemp();
-  renderProgress();
-  updateToolButtons();
-}
-// --- Corrected onload behavior ---
 window.onload=function(){
-  // Do not play BGM on load, wait for user interaction.
-  document.getElementById('music-toggle').innerHTML = game.bgmOn?'⏸️':'▶️';
-  updateToolButtons(); // Initial update of tool buttons
+  document.getElementById('music-toggle').innerHTML = game.bgmOn?'🎵':'⏸️';
+  updateToolButtons();
+  footer.style.display = 'none';
 }
 </script>
 </body>
