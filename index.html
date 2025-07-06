@@ -105,10 +105,36 @@
       z-index: 100 !important;
       transform: scale(1.08) rotate(-3deg);
     }
+
+    /* MODIFIED: Gray overlay for disabled cards */
     .card.disabled {
-      opacity: 0.42;
+      /* Keep existing pointer-events: none */
       pointer-events: none;
+      position: absolute; /* Ensure positioning for pseudo-element */
     }
+
+    .card.disabled::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(128, 128, 128, 0.4); /* Gray with 40% opacity */
+      border-radius: 8px; /* Match card border-radius */
+      z-index: 2; /* Ensure it's above the card content */
+      transition: background 0.3s ease; /* Smooth transition for overlay */
+    }
+
+    /* You might want to slightly reduce the icon opacity too for consistency */
+    .card.disabled {
+        opacity: 1; /* Reset opacity on the card itself */
+    }
+    .card.disabled > *:not(.disabled::before) {
+        opacity: 0.6; /* Apply opacity to content (icon) */
+    }
+    /* END MODIFIED */
+
     .card.matched {
       opacity: 0.1;
       transition: opacity 0.23s;
@@ -554,7 +580,7 @@ function genLevel(levelIdx){
   // Ensure enough unique icons for the level's total cards / 3
   const requiredUniqueIcons = Math.ceil(lv.total / 3);
   let availableIcons = randArr(CARD_ICONS); // Shuffle available icons
-  // If not enough unique icons are available for the total number of cards,
+  // If not enough unique icons is available for the total number of cards,
   // we might run into an issue. For now, assume CARD_ICONS is sufficient.
   availableIcons = availableIcons.slice(0, Math.min(availableIcons.length, requiredUniqueIcons + 2)); // Use a few extra to ensure variety
 
