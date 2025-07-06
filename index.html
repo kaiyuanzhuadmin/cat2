@@ -511,7 +511,7 @@ const LEVELS = [
 ];
 const TEMP_LIMIT = 7;
 const CODE = "kaiyuan";
-const TOOL_GRANT_COUNT = 9;
+const TOOL_GRANT_COUNT = 3;
 
 // --- Get Audio elements once ---
 const bgm = document.getElementById('bgm');
@@ -795,18 +795,18 @@ function clickCard(id) {
   let cardData = game.board.find(c => c.id === id); // Find the card data
   
   if (!cardData || cardData.matched || !isCardClickable(cardData, game.board)) return;
-  if (game.temp.length >= TEMP_LIMIT) {
-    // If temp area is full AND no immediate match possible, then it's game over
-    // Check if a match is possible after adding this card to the temp area
-    let tempCheck = [...game.temp, { icon: cardData.icon, id: cardData.id }];
-    let iconCnt = {};
-    tempCheck.forEach(c => iconCnt[c.icon] = (iconCnt[c.icon] || 0) + 1);
-    let matchedIcon = Object.keys(iconCnt).find(k => iconCnt[k] === 3);
+  
+  // Pre-check for game over BEFORE starting animation or adding to temp
+  let tempCheck = [...game.temp, { icon: cardData.icon, id: cardData.id }];
+  let iconCntCheck = {};
+  tempCheck.forEach(c => iconCntCheck[c.icon] = (iconCntCheck[c.icon] || 0) + 1);
+  let matchedIconCheck = Object.keys(iconCntCheck).find(k => iconCntCheck[k] === 3);
 
-    if (!matchedIcon) { // If no match possible even with this card
-        setTimeout(() => gameOver('暂存区已超限，游戏失败！'), 100);
-        return;
-    }
+  if (game.temp.length >= TEMP_LIMIT && !matchedIconCheck) {
+      // If temp area is full AND no immediate match possible with this card, it's game over.
+      // Call gameOver directly here without processing the card further.
+      gameOver('暂存区已超限，游戏失败！');
+      return;
   }
 
   game.lock = true;
@@ -823,6 +823,7 @@ function clickCard(id) {
   const startRect = clickedCardEl.getBoundingClientRect();
   
   // Temporarily add card to temp array to determine its final position
+  // Use the actual game.temp after the pre-check
   const tempForPosition = [...game.temp, { icon: cardData.icon, id: cardData.id }];
   tempForPosition.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
   const endSlotIndex = tempForPosition.findIndex(c => c.id === id);
@@ -882,11 +883,9 @@ function clickCard(id) {
       }, 330);
     } else {
       renderBoard(); // Update clickable state of other cards
-      if (game.temp.length >= TEMP_LIMIT) {
-        setTimeout(() => gameOver('暂存区已超限，游戏失败！'), 100);
-      } else {
-        game.lock = false; // Unlock if no match and not game over
-      }
+      // The game over check for full temp area is now done BEFORE the card is processed.
+      // So, if we reach here, either there's room, or there's a match.
+      game.lock = false; // Unlock if no match and not game over
     }
     renderProgress();
   }, 350); // This must match the CSS transition duration
@@ -1071,13 +1070,22 @@ function showLevelFinish(msg){
   document.getElementById('level-finish-text').innerHTML=msg;
   document.getElementById('next-btn').style.display = (game.level===1)?'inline-block':'none';
 }
+
+// MODIFIED gameOver function
 function gameOver(msg){
   game.lock=true;
+  // Clear the board and temp area to only show the game over screen
+  document.getElementById('card-stack-area').innerHTML = '';
+  document.querySelectorAll('#temp-area .temp-slot').forEach(slot => slot.innerHTML = '');
+  document.getElementById('progress-info').textContent = ''; // Clear progress info
+  document.getElementById('message-bar').textContent = ''; // Clear any other messages
+
   setTimeout(()=>{
     document.getElementById('game-over').style.display='flex';
     document.getElementById('game-over-text').innerHTML=msg;
-  },330);
+  },100); // A small delay to ensure any ongoing animation finishes visually
 }
+
 function startGame(level){
   game.level=level;
   if (level === 2) {
