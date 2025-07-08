@@ -827,36 +827,45 @@ function genLevel(levelIdx){
   
   board.sort((a, b) => a.z - b.z);
 
-  for(let i = 0; i < board.length; i++){
-    let ci = board[i];
-    ci.coveredBy = [];
-    for(let j = 0; j < board.length; j++){
-      if(i === j) continue;
-      let cj = board[j];
-      const overlapThresholdX = cardW * 0.6;
-      const overlapThresholdY = cardH * 0.6;
-
-      if(cj.z > ci.z && 
-         Math.abs(cj.x - ci.x) < overlapThresholdX && 
-         Math.abs(cj.y - ci.y) < overlapThresholdY)
-      {
-        ci.coveredBy.push(cj.id);
-      }
-    }
-  }
+  // The coveredBy logic is removed here as it's now handled dynamically
   
   return {cards, board, usedIcons: availableIcons.slice(0, Math.ceil(lv.total/3))};
 }
 
 function isCardClickable(card, board){
   if(card.matched) return false;
-  let self = board.find(c=>c.id===card.id);
-  if (!self) return false;
   
-  return self.coveredBy.every(cid=>{
-    let coveringCard = board.find(cc=>cc.id===cid);
-    return coveringCard && coveringCard.matched;
-  });
+  // Find all cards that are NOT matched yet
+  const activeCards = board.filter(c => !c.matched);
+
+  // Define overlap thresholds based on current level card sizes
+  const cardW = (game.level === 2) ? 50 : 65;
+  const cardH = (game.level === 2) ? 65 : 85;
+  const overlapThresholdX = cardW * 0.7; 
+  const overlapThresholdY = cardH * 0.7; 
+
+  // Check if this card is covered by any other active card
+  for (const otherCard of activeCards) {
+    // A card cannot cover itself
+    if (card.id === otherCard.id) {
+      continue;
+    }
+
+    // Check if the 'otherCard' is visually on top of 'card' (higher z-index)
+    if (otherCard.z > card.z) {
+      // Check for significant overlap in position
+      const dx = Math.abs(otherCard.x - card.x);
+      const dy = Math.abs(otherCard.y - card.y);
+
+      if (dx < overlapThresholdX && dy < overlapThresholdY) {
+        // If otherCard significantly overlaps this card and is on top, then this card is covered
+        return false;
+      }
+    }
+  }
+
+  // If no active card is covering it, it's clickable
+  return true;
 }
 
 function clickCard(id) {
