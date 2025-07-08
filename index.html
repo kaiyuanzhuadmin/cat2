@@ -569,7 +569,7 @@
 <div id="game-container">
   <div id="header-bar">
     <div id="progress-info">关卡: 1 / 2 | 剩余卡牌: --</div>
-    <button id="music-toggle" title="音乐开关">🎵</button>
+    <button id="music-toggle" title="音乐开关">🎼</button>
   </div>
   <div id="main-area">
     <div id="card-stack-area"></div>
@@ -1281,7 +1281,7 @@ document.getElementById('code-btn').onclick=function(){
 };
 document.getElementById('music-toggle').onclick=function(){
   game.bgmOn = !game.bgmOn;
-  this.innerHTML = game.bgmOn?'🎵':'⏸️';
+  this.innerHTML = game.bgmOn?'🎼':'🔇';
   playBgm(game.bgmOn);
 };
 document.getElementById('start-btn').onclick = function(){
@@ -1320,7 +1320,7 @@ document.getElementById('next-btn').onclick = function(){
       playBgm(game.bgmOn); 
     };
 window.onload=function(){
-  document.getElementById('music-toggle').innerHTML = game.bgmOn?'🎵':'⏸️';
+  document.getElementById('music-toggle').innerHTML = game.bgmOn?'🎼':'🔇';
   updateToolButtons();
   footer.style.display = 'none';
 }
