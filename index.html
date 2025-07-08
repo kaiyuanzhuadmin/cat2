@@ -226,7 +226,7 @@
       justify-content: center;
       font-size: 2.6rem;
       user-select: none;
-      z-index: 999;
+      z-index: 10000; /* Ensured it's on top */
       transition: top 0.35s ease-in-out, left 0.35s ease-in-out, transform 0.35s ease-in-out;
       overflow: hidden;
       color: #5d4037;
@@ -614,7 +614,6 @@
   </div>
 </div>
 
-<!-- Custom Confirm Modal -->
 <div id="confirm-modal" class="modal-overlay">
   <div class="modal-content">
     <p id="confirm-msg">你确定吗？</p>
@@ -663,7 +662,7 @@ let game = {
   progress: 0,
   stepStack: [],
   bgmOn: true,
-  lock: false
+  lock: false // This lock prevents multiple clicks causing issues
 };
 
 function randArr(arr) {
@@ -862,6 +861,7 @@ function isCardClickable(card, board){
 
 function clickCard(id) {
   if (game.lock) return;
+
   let cardData = game.board.find(c => c.id === id);
   
   if (!cardData || cardData.matched || !isCardClickable(cardData, game.board)) return;
@@ -876,11 +876,10 @@ function clickCard(id) {
       return;
   }
 
-  game.lock = true;
   saveStep();
+  game.lock = true; // Lock the game early to prevent multiple clicks
 
   const clickedCardEl = document.querySelector(`#card-stack-area .card[data-id='${id}']`);
-
   if (!clickedCardEl) {
     game.lock = false;
     return;
@@ -888,18 +887,7 @@ function clickCard(id) {
 
   const startRect = clickedCardEl.getBoundingClientRect();
   
-  const tempForPositionCalculation = [...game.temp, { icon: cardData.icon, id: cardData.id }];
-  tempForPositionCalculation.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
-  const endSlotIndex = tempForPositionCalculation.findIndex(c => c.id === id);
-
-  const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
-  if (endSlotIndex < 0 || endSlotIndex >= tempSlots.length) {
-      console.error("Invalid end slot index calculated. Aborting card animation.");
-      game.lock = false;
-      return;
-  }
-  const endRect = tempSlots[endSlotIndex].getBoundingClientRect();
-
+  // Create the flying card element
   const flyingCard = document.createElement('div');
   flyingCard.className = 'flying-card';
   flyingCard.innerHTML = cardData.icon;
@@ -907,11 +895,38 @@ function clickCard(id) {
 
   flyingCard.style.left = `${startRect.left}px`;
   flyingCard.style.top = `${startRect.top}px`;
+  flyingCard.style.width = `${startRect.width}px`;
+  flyingCard.style.height = `${startRect.height}px`;
 
+  // Immediately hide the original card
   clickedCardEl.style.opacity = '0';
   clickedCardEl.style.pointerEvents = 'none';
 
+  playClickSound();
+
+  // The duration of the flying animation
+  const animationDuration = 150; // milliseconds, matches CSS transition
+
+  // The delay before the card actually appears in the temp area
+  // This should be slightly less than the animation duration for a smooth transition
+  const tempAppearanceDelay = 80; 
+
   requestAnimationFrame(() => {
+    // Calculate target position and scale for the flying card based on its final sorted position
+    // Temporarily add card to temp array to find its final sorted position
+    const tempForPositionCalculation = [...game.temp, { icon: cardData.icon, id: cardData.id }];
+    tempForPositionCalculation.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
+    const endSlotIndex = tempForPositionCalculation.findIndex(c => c.id === id);
+    const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
+    
+    if (endSlotIndex < 0 || endSlotIndex >= tempSlots.length) {
+        console.error("Invalid end slot index calculated for flying card. Aborting animation.");
+        document.body.removeChild(flyingCard); // Clean up if an error occurs
+        game.lock = false;
+        return;
+    }
+
+    const endRect = tempSlots[endSlotIndex].getBoundingClientRect();
     const tempSlotStyle = window.getComputedStyle(tempSlots[endSlotIndex]);
     const flyingCardFinalWidth = parseFloat(tempSlotStyle.width) * 0.9;
     const flyingCardFinalHeight = parseFloat(tempSlotStyle.height) * 0.9;
@@ -921,17 +936,24 @@ function clickCard(id) {
 
     flyingCard.style.left = `${destLeft}px`;
     flyingCard.style.top = `${destTop}px`;
-    flyingCard.style.transform = `scale(${flyingCardFinalWidth / startRect.width})`;
+    flyingCard.style.transform = `scale(${flyingCardFinalWidth / parseFloat(startRect.width)})`;
   });
 
+  // Remove the flying card after its animation completes
   setTimeout(() => {
     document.body.removeChild(flyingCard);
-    
-    cardData.matched = true;
+  }, animationDuration);
+
+  // Update game state and render temp area after a short delay, 
+  // making the card "appear" in its slot as the flying animation concludes.
+  setTimeout(() => {
+    cardData.matched = true; // Mark the card on the board as matched
     game.temp.push({ icon: cardData.icon, id: cardData.id, matched: false });
     game.temp.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
-    renderTemp();
-    playClickSound();
+    
+    renderTemp(); // Re-render the temp area to show the new card
+    renderBoard(); // Re-render the board to update clickable status
+    renderProgress(); // Update progress display
 
     let iconCnt = {};
     game.temp.forEach(c => {
@@ -947,14 +969,13 @@ function clickCard(id) {
         renderTemp();
         renderBoard();
         checkWin();
-        game.lock = false;
-      }, 330);
+        game.lock = false; // Release lock after match animation
+      }, 100); // Delay for matched card fade-out in temp area
     } else {
-      renderBoard();
-      game.lock = false;
+      checkWin(); // Check for win even if no immediate match
+      game.lock = false; // Release lock if no match
     }
-    renderProgress();
-  }, 350);
+  }, tempAppearanceDelay);
 }
 
 function checkWin(){
