@@ -560,7 +560,10 @@
         width: 50%;
       }
     }
-  </style>
+ </style>
+ <!-- 音乐播放器的样式 -->
+    <link rel="stylesheet" href="font/iconfont.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div id="game-container">
@@ -601,6 +604,53 @@
     <small>喵了个咪 &copy; 2025 | Designed by 开元</small>
   </div>
   <div id="level-finish" style="display:none;">
+ <!-- 音乐播放器 HTML 代码 -->
+    <div id="player">
+        <!-- 歌曲信息模块 -->
+        <div id="player-content1">
+            <!-- 歌曲名 -->
+            <div class="music-name"></div>
+            <!-- 歌手名 -->
+            <div class="artist-name"></div>
+            <!-- 歌曲时间 -->
+            <div class="time">
+                <!-- 当前播放的时间 -->
+                <div class="current-time"></div>
+                <!-- 歌曲总时长 -->
+                <div class="total-time"></div>
+            </div>
+            <!-- 进度条 -->
+            <div id="s-area">
+                <!-- 鼠标移动到进度条上，显示的时间信息 -->
+                <div id="ins-time"></div>
+                <!-- 鼠标移动到进度条上，进度条变暗部分-->
+                <div id="s-hover"></div>
+                <!-- 表示当前歌曲播放进度的蓝色进度条 -->
+                <div id="seek-bar"></div>
+            </div>
+        </div>
+
+        <!-- 控制模块 -->
+        <div id="player-content2">
+            <!-- 左侧歌曲封面旋转模块 -->
+            <div class="music-imgs">
+                <!-- 封面图 -->
+                <div class="img"></div>
+                <!-- 歌曲缓冲时的提示文字 -->
+                <div id="buffer-box">缓冲…</div>
+            </div>
+            <!-- 右侧歌曲操作模块 -->
+            <div class="player-controls">
+                <!-- 上一首按钮 -->
+                <div class="btn prev iconfont">&#xe603;</div>
+                <!-- 暂停/播放 按钮 -->
+                <div class="btn play-pause icon-jiediankaishi iconfont"></div>
+                <!-- 下一首按钮 -->
+                <div class="btn next iconfont">&#xe602;</div>
+            </div>
+        </div>
+    </div>
+
     <div id="level-finish-text"></div>
     <button id="next-btn">下一关</button>
     <button id="retry-btn" style="margin-left:10px;">重玩</button>
@@ -626,8 +676,9 @@
 
 
 <audio id="bgm" src="PVZ.mp3" loop preload="auto"></audio>
-<audio id="click-sound" src="boom.mp3" preload="auto"></audio>
-
+<audio id="click-sound" src="bullet.mp3" preload="auto"></audio>
+ <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="js/index.js"></script>
 <script>
 const CARD_ICONS = [
   "🐈", "🀄️", "🧩", "🪆", "🏵️", "🧸", "🍬", "🔮", "🎡", "🪙", "🐩", "🪭",
@@ -1253,8 +1304,21 @@ function showLevelFinish(msg){
   document.getElementById('level-finish').style.display='flex';
   document.getElementById('level-finish-text').innerHTML=msg;
   document.getElementById('next-btn').style.display = (game.level===1)?'inline-block':'none';
+  playBgm(false); 
 }
+document.getElementById('next-btn').onclick = function(){
+      document.getElementById('level-finish').style.display='none';
+      startGame(2);
+      // 离开关卡完成界面时继续播放音乐
+      playBgm(game.bgmOn); 
+    };
 
+    document.getElementById('retry-btn').onclick = function(){
+      document.getElementById('level-finish').style.display='none';
+      startGame(game.level);
+      // 离开关卡完成界面时继续播放音乐
+      playBgm(game.bgmOn); 
+    };
 window.onload=function(){
   document.getElementById('music-toggle').innerHTML = game.bgmOn?'🎵':'⏸️';
   updateToolButtons();
