@@ -404,7 +404,22 @@
       color: #5d4037;
       background: rgba(255,255,255,0.99);
       border-radius: 25px;
+      position: absolute;
+      overflow: hidden; /* 确保背景图不超出容器 */
     }
+    #level-finish::before, #game-over::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background-image: url('cats.png'); /* 使用与开始界面相同的背景图 */
+      background-size: cover;
+      background-position: center;
+      opacity: 0.1; /* 透明度10% */
+      z-index: -1; /* 确保背景在内容下方 */
+}
     #level-finish button, #game-over button {
       margin-top: 25px;
       padding: 12px 35px;
