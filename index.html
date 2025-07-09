@@ -1208,7 +1208,13 @@ function startGame(level){
   game.lock = false;
   renderAll();
   updateToolButtons();
-  playBgm(game.bgmOn);
+  if (level === 2) {
+    game.bgmOn = false; // 更新音乐状态为关闭
+    document.getElementById('music-toggle').innerHTML = '🔇'; // 更新按钮显示
+    playBgm(false); // 停止播放
+  } else {
+    playBgm(game.bgmOn); // 第一关正常播放
+  }
 }
 
 function renderBoard(){
