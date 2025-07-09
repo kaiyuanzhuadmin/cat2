@@ -729,8 +729,21 @@ const LEVELS = [
   {num: 2, visible: 90, total: 150, stack: 2, rows: 7, cols: 9, overlap: 22}
 ];
 const TEMP_LIMIT = 7;
-const CODE = "kaiyuan";
-const TOOL_GRANT_COUNT = 20;
+
+/*
+* MODIFICATION START: Replaced single code with an object for multiple codes.
+* You can now add, remove, or change codes and their rewards here.
+* The key is the redemption code (in lowercase).
+* The value is an object specifying the counts for each tool.
+*/
+const REDEMPTION_CODES = {
+  "kaiyuan": { undo: 20, hint: 20, shuffle: 20 },
+  "vip666": { undo: 5, hint: 5, shuffle: 5 },
+  "super888": { undo: 50, hint: 50, shuffle: 50 },
+  "starterpack": { undo: 3, hint: 1, shuffle: 1 },
+  "challenge": { undo: 1, hint: 1, shuffle: 0 }
+};
+// MODIFICATION END
 
 const bgm = document.getElementById('bgm');
 const clickSound = document.getElementById('click-sound');
@@ -917,8 +930,6 @@ function genLevel(levelIdx){
   }
   
   board.sort((a, b) => a.z - b.z);
-
-  // The coveredBy logic is removed here as it's now handled dynamically
   
   return {cards, board, usedIcons: availableIcons.slice(0, Math.ceil(lv.total/3))};
 }
@@ -926,36 +937,28 @@ function genLevel(levelIdx){
 function isCardClickable(card, board){
   if(card.matched) return false;
   
-  // Find all cards that are NOT matched yet
   const activeCards = board.filter(c => !c.matched);
 
-  // Define overlap thresholds based on current level card sizes
   const cardW = (game.level === 2) ? 50 : 65;
   const cardH = (game.level === 2) ? 65 : 85;
   const overlapThresholdX = cardW * 0.7; 
   const overlapThresholdY = cardH * 0.7; 
 
-  // Check if this card is covered by any other active card
   for (const otherCard of activeCards) {
-    // A card cannot cover itself
     if (card.id === otherCard.id) {
       continue;
     }
 
-    // Check if the 'otherCard' is visually on top of 'card' (higher z-index)
     if (otherCard.z > card.z) {
-      // Check for significant overlap in position
       const dx = Math.abs(otherCard.x - card.x);
       const dy = Math.abs(otherCard.y - card.y);
 
       if (dx < overlapThresholdX && dy < overlapThresholdY) {
-        // If otherCard significantly overlaps this card and is on top, then this card is covered
         return false;
       }
     }
   }
 
-  // If no active card is covering it, it's clickable
   return true;
 }
 
@@ -977,7 +980,7 @@ function clickCard(id) {
   }
 
   saveStep();
-  game.lock = true; // Lock the game early to prevent multiple clicks
+  game.lock = true; 
 
   const clickedCardEl = document.querySelector(`#card-stack-area .card[data-id='${id}']`);
   if (!clickedCardEl) {
@@ -987,7 +990,6 @@ function clickCard(id) {
 
   const startRect = clickedCardEl.getBoundingClientRect();
   
-  // Create the flying card element
   const flyingCard = document.createElement('div');
   flyingCard.className = 'flying-card';
   flyingCard.innerHTML = cardData.icon;
@@ -998,22 +1000,15 @@ function clickCard(id) {
   flyingCard.style.width = `${startRect.width}px`;
   flyingCard.style.height = `${startRect.height}px`;
 
-  // Immediately hide the original card
   clickedCardEl.style.opacity = '0';
   clickedCardEl.style.pointerEvents = 'none';
 
   playClickSound();
 
-  // The duration of the flying animation
-  const animationDuration = 150; // milliseconds, matches CSS transition
-
-  // The delay before the card actually appears in the temp area
-  // This should be slightly less than the animation duration for a smooth transition
+  const animationDuration = 150; 
   const tempAppearanceDelay = 80; 
 
   requestAnimationFrame(() => {
-    // Calculate target position and scale for the flying card based on its final sorted position
-    // Temporarily add card to temp array to find its final sorted position
     const tempForPositionCalculation = [...game.temp, { icon: cardData.icon, id: cardData.id }];
     tempForPositionCalculation.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
     const endSlotIndex = tempForPositionCalculation.findIndex(c => c.id === id);
@@ -1021,7 +1016,7 @@ function clickCard(id) {
     
     if (endSlotIndex < 0 || endSlotIndex >= tempSlots.length) {
         console.error("Invalid end slot index calculated for flying card. Aborting animation.");
-        document.body.removeChild(flyingCard); // Clean up if an error occurs
+        document.body.removeChild(flyingCard);
         game.lock = false;
         return;
     }
@@ -1039,21 +1034,18 @@ function clickCard(id) {
     flyingCard.style.transform = `scale(${flyingCardFinalWidth / parseFloat(startRect.width)})`;
   });
 
-  // Remove the flying card after its animation completes
   setTimeout(() => {
     document.body.removeChild(flyingCard);
   }, animationDuration);
 
-  // Update game state and render temp area after a short delay, 
-  // making the card "appear" in its slot as the flying animation concludes.
   setTimeout(() => {
-    cardData.matched = true; // Mark the card on the board as matched
+    cardData.matched = true; 
     game.temp.push({ icon: cardData.icon, id: cardData.id, matched: false });
     game.temp.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
     
-    renderTemp(); // Re-render the temp area to show the new card
-    renderBoard(); // Re-render the board to update clickable status
-    renderProgress(); // Update progress display
+    renderTemp(); 
+    renderBoard(); 
+    renderProgress(); 
 
     let iconCnt = {};
     game.temp.forEach(c => {
@@ -1069,11 +1061,11 @@ function clickCard(id) {
         renderTemp();
         renderBoard();
         checkWin();
-        game.lock = false; // Release lock after match animation
-      }, 100); // Delay for matched card fade-out in temp area
+        game.lock = false; 
+      }, 100); 
     } else {
-      checkWin(); // Check for win even if no immediate match
-      game.lock = false; // Release lock if no match
+      checkWin(); 
+      game.lock = false; 
     }
   }, tempAppearanceDelay);
 }
@@ -1209,11 +1201,11 @@ function startGame(level){
   renderAll();
   updateToolButtons();
   if (level === 2) {
-    game.bgmOn = false; // 更新音乐状态为关闭
-    document.getElementById('music-toggle').innerHTML = '🔇'; // 更新按钮显示
-    playBgm(false); // 停止播放
+    game.bgmOn = false; 
+    document.getElementById('music-toggle').innerHTML = '🔇'; 
+    playBgm(false); 
   } else {
-    playBgm(game.bgmOn); // 第一关正常播放
+    playBgm(game.bgmOn); 
   }
 }
 
@@ -1312,19 +1304,31 @@ document.getElementById('restart-btn').onclick = function() {
     });
 };
 
+/*
+* MODIFICATION START: Updated the code redemption logic.
+* This function now checks the input against the REDEMPTION_CODES object.
+*/
 document.getElementById('code-btn').onclick=function(){
   let val = document.getElementById('code-input').value.trim().toLowerCase();
-  if(val===CODE){
-    game.toolUses.undo += TOOL_GRANT_COUNT;
-    game.toolUses.hint += TOOL_GRANT_COUNT;
-    game.toolUses.shuffle += TOOL_GRANT_COUNT;
-    showMessage(`兑换成功，道具已解锁！各增加 ${TOOL_GRANT_COUNT} 次使用机会！`, "#3e5a2b");
+  
+  if (REDEMPTION_CODES[val]) {
+    const rewards = REDEMPTION_CODES[val];
+    game.toolUses.undo += rewards.undo;
+    game.toolUses.hint += rewards.hint;
+    game.toolUses.shuffle += rewards.shuffle;
+
+    // Optional: Add a check to prevent reusing codes
+    // delete REDEMPTION_CODES[val]; 
+    
+    showMessage(`兑换成功！获得撤销x${rewards.undo}, 提示x${rewards.hint}, 洗牌x${rewards.shuffle}`, "#3e5a2b");
     updateToolButtons();
-  }else{
+  } else {
     showMessage('兑换码错误', "#c0392b");
   }
   document.getElementById('code-input').value='';
 };
+// MODIFICATION END
+
 document.getElementById('music-toggle').onclick=function(){
   game.bgmOn = !game.bgmOn;
   this.innerHTML = game.bgmOn?'🎼':'🔇';
@@ -1355,14 +1359,12 @@ function showLevelFinish(msg){
 document.getElementById('next-btn').onclick = function(){
       document.getElementById('level-finish').style.display='none';
       startGame(2);
-      // 离开关卡完成界面时继续播放音乐
       playBgm(game.bgmOn); 
     };
 
     document.getElementById('retry-btn').onclick = function(){
       document.getElementById('level-finish').style.display='none';
       startGame(game.level);
-      // 离开关卡完成界面时继续播放音乐
       playBgm(game.bgmOn); 
     };
 window.onload=function(){
