@@ -20,7 +20,7 @@ $(function(){
     
     // 一些计算所需的变量
     var seekT, seekLoc, seekBarPos, cM, ctMinutes, ctSeconds, curMinutes, curSeconds, durMinutes, durSeconds, playProgress, bTime, nTime = 0
-    var musicImgsData = ['img/bg.png','img/bg1.png','img/bg2.png']    // 图片地址数组
+    var musicImgsData = ['img/bg.webp','img/bg1.webp','img/bg2.webp']    // 图片地址数组
     var musicNameData = ['Auld Lang Syne','Symphony','Mood (Lofi)'];                   // 歌曲名数组
     var artistNameData = ['王源','One Voice/Rob Landes','Hloshit']            // 创作歌手数组
     var musicUrls=['mp3/music1.mp3','mp3/music2.mp3','mp3/music3.mp3'];// 歌曲mp3数组
