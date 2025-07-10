@@ -24,13 +24,16 @@
       left: 0; right: 0; top: 0; bottom: 0;
       z-index: 88;
       display: flex;
+      /* MODIFIED: Changed vertical alignment */
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
+      padding-top: 18vh;
       flex-direction: column;
       font-size: 1.3rem;
       border-radius: 25px;
       text-align: center;
       overflow: hidden; /* 确保背景图不会超出容器 */
+      box-sizing: border-box;
     }
 
     /* 添加背景图容器 */
@@ -389,6 +392,8 @@
         color: #5d4037;
         line-height: 1.6;
         margin: 0 40px 15px;
+        /* MODIFIED: Pushed down from title */
+        margin-top: 20vh;
     }
     #start-screen span {
         color: #c0392b;
@@ -397,7 +402,12 @@
     #start-screen small {
         color: #795548;
         font-size: 0.85rem;
-        margin-top: 30px;
+        /* MODIFIED: Positioned at the bottom */
+        position: absolute;
+        bottom: 30px;
+        left: 0;
+        right: 0;
+        text-align: center;
     }
     #level-finish, #game-over {
       font-size: 2rem;
@@ -584,6 +594,14 @@
       text-align: center;
       width: 80%;
       max-width: 500px;
+      /* MODIFIED: Changed to flex layout for vertical spacing */
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 18vh;
+      box-sizing: border-box;
     }
     .loading-title {
       font-size: 3.2rem;
@@ -602,6 +620,8 @@
       overflow: hidden;
       margin-bottom: 15px;
       box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+      /* MODIFIED: Pushed down from the title */
+      margin-top: 25vh;
     }
     #progress-bar {
       width: 0%;
@@ -622,6 +642,12 @@
       font-family: 'FangSong', 'Comic Sans MS', cursive;
       letter-spacing: 1.5px;
       text-shadow: 0.5px 0.5px 0 rgba(255,255,255,0.5);
+      /* MODIFIED: Positioned at the bottom */
+      position: absolute;
+      bottom: 30px;
+      left: 0;
+      right: 0;
+      text-align: center;
     }
     /* --- End Loading Screen Styles --- */
 
