@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <title>喵了个咪</title>
-  <link rel="icon" type="image/webp" sizes="96x96" href="me.webp">
+  <link rel="icon" type="image/png" sizes="96x96" href="me.png">
   <style>
     /* New Chinese-style fonts */
     @font-face {
@@ -607,70 +607,6 @@
     <link rel="stylesheet" href="font/iconfont.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<div id="loading-screen" style="position: fixed; left: 0; right: 0; top: 0; bottom: 0; z-index: 9999; background: #f7f0e8 url('mao3.webp') no-repeat center center fixed; background-size: cover; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 100px;">
-  <!-- 新增白色蒙版层 -->
-  <div style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; background: white; opacity: 0.85; z-index: 1;"></div>
-  <div style="font-family: 'HanyiSentyLotus', cursive; font-size: 3rem; color: #8B4513; margin-bottom: 150px; text-shadow: 2px 2px 0 #f7e9d7; position: relative; z-index: 2;">喵了个咪 🐾</div>
-  <div style="width: 200px; height: 8px; background: rgba(184, 134, 11, 0.2); border-radius: 4px; overflow: hidden; position: relative; z-index: 2;">
-    <div id="loading-progress" style="width: 0%; height: 100%; background: linear-gradient(90deg, #b8860b, #d4a762); transition: width 0.3s ease-in-out;"></div>
-  </div>
-  </div>
-  <div id="loading-text" style="margin-top: 15px; color: #5d4037; font-size: 1rem; position: relative; z-index: 2;">加载中...</div>
-</div>
-
-<script>
-// 模拟资源加载进度
-let progress = 0;
-const loadingScreen = document.getElementById('loading-screen');
-const progressBar = document.getElementById('loading-progress');
-const progressText = document.getElementById('loading-text');
-
-// 监听图片加载
-const images = ['me.webp', 'mao.webp', 'cat1.webp', 'mao1.webp'];
-let loadedImages = 0;
-
-images.forEach(src => {
-  const img = new Image();
-  img.src = src;
-  img.onload = updateProgress;
-  img.onerror = updateProgress;
-});
-
-// 监听音频加载
-const audios = ['Get.mp3', 'bullt.mp3'];
-audios.forEach(src => {
-  const audio = new Audio();
-  audio.src = src;
-  audio.oncanplaythrough = updateProgress;
-  audio.onerror = updateProgress;
-});
-
-function updateProgress() {
-  progress += 100 / (images.length + audios.length);
-  if (progress > 100) progress = 100;
-  
-  progressBar.style.width = progress + '%';
-  progressText.textContent = `加载中... ${Math.round(progress)}%`;
-  
-  if (progress === 100) {
-    setTimeout(() => {
-      loadingScreen.style.opacity = '0';
-      loadingScreen.style.transition = 'opacity 0.5s ease-out';
-      setTimeout(() => {
-        loadingScreen.style.display = 'none';
-      }, 500);
-    }, 500);
-  }
-}
-
-// 防止加载超时
-setTimeout(() => {
-  if (progress < 100) {
-    progress = 100;
-    updateProgress();
-  }
-}, 10000);
-</script>
 <body>
 <div id="game-container">
   <div id="header-bar">
