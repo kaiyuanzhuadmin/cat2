@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <title>喵了个咪</title>
   <link rel="icon" type="image/png" sizes="96x96" href="me.png">
-  <!-- 预加载关键背景图片以提高显示速度 -->
-  <link rel="preload" href="cat1.webp" as="image">
-  <link rel="preload" href="mao.webp" as="image">
-  <link rel="preload" href="mao1.webp" as="image"> <!-- Added preload for mao1.webp -->
   <style>
     /* New Chinese-style fonts */
     @font-face {
@@ -727,7 +723,7 @@
     <script src="js/index.js"></script>
 <script>
 const CARD_ICONS = [
-  "🐈", "💐", "🧩", "👒", "🏵️", "🌈", "🍬", "🔮", "🎡", "🧸", "🚵‍♀️", "🍭",
+  "🐈", "💐", "🧩", "👒", "🏵️", "🧸", "🍬", "🔮", "🎡", "🪙", "🚵‍♀️", "🪭",
   "🐖", "🧶", "🌻", "✂️", "🦋", "🍄"  
 ];
 const LEVELS = [
@@ -896,7 +892,7 @@ function genLevel(levelIdx){
       tempY += (s * 5 * (Math.random() - 0.5));
 
       tempX = Math.max(5, Math.min(tempX, areaW - cardW - 5));
-      tempY = Math.min(tempY, areaH - cardH - 5);
+      tempY = Math.max(5, Math.min(tempY, areaH - cardH - 5));
 
       let overlap = false;
       for (const existingCard of board) {
@@ -1096,11 +1092,13 @@ function saveStep(){
   if(game.stepStack.length>20) game.stepStack.shift();
 }
 function undoStep(){
-  if(game.toolUses.undo > 0 && game.stepStack.length > 0){
-    undoStep();
-    game.toolUses.undo--;
-    updateToolButtons();
-  } else if (game.toolUses.undo > 0 && game.stepStack.length === 0) {
+  if(game.stepStack.length>0){
+    let prev = game.stepStack.pop();
+    game.board = deepClone(prev.board);
+    game.temp = deepClone(prev.temp);
+    renderAll();
+    showMessage('已撤销');
+  } else {
     showMessage('无法撤销更多', '#888');
   }
 }
@@ -1379,4 +1377,3 @@ window.onload=function(){
 </script>
 </body>
 </html>
-�
