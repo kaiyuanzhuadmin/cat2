@@ -6,129 +6,7 @@
   <title>喵了个咪</title>
   <link rel="icon" type="image/png" sizes="96x96" href="me.png">
   <style>
-    /* 加载界面样式 */
-    #loading-screen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #f7f0e8 0%, #ffe4b5 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      font-family: 'FangSong', 'Segoe UI', 'PingFang SC', 'Helvetica Neue', Arial, 'Microsoft Yahei', sans-serif;
-      color: #5d4037;
-      text-align: center;
-      opacity: 1;
-      transition: opacity 0.5s ease-out;
-    }
-    
-    #loading-screen.fade-out {
-      opacity: 0;
-      pointer-events: none;
-    }
-    
-    .loading-title {
-      font-size: 3.5rem;
-      margin-bottom: 20px;
-      color: #8B4513;
-      text-shadow: 2px 2px 0 #f7e9d7, 4px 4px 0 #b8860b;
-      animation: bounceIn 1s ease-out;
-    }
-    
-    .loading-cat {
-      font-size: 4rem;
-      margin-bottom: 30px;
-      animation: catWalk 2s infinite;
-    }
-    
-    .loading-progress {
-      width: 300px;
-      height: 20px;
-      background: #e0d4c7;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 20px;
-      border: 2px solid #b8860b;
-      box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
-    }
-    
-    .progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #a0c388, #88b368);
-      border-radius: 8px;
-      transition: width 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .progress-bar::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-      animation: shimmer 2s infinite;
-    }
-    
-    .progress-percentage {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 15px;
-      color: #6e352f;
-    }
-    
-    .loading-text {
-      font-size: 1.1rem;
-      color: #795548;
-      margin-bottom: 10px;
-      min-height: 25px;
-      animation: fadeInOut 1s ease-in-out;
-    }
-    
-    .loading-footer {
-      position: absolute;
-      bottom: 30px;
-      font-size: 0.9rem;
-      color: #8B4513;
-      opacity: 0.7;
-    }
-    
-    @keyframes bounceIn {
-      0% { transform: scale(0.3); opacity: 0; }
-      50% { transform: scale(1.05); }
-      70% { transform: scale(0.9); }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    
-    @keyframes catWalk {
-      0%, 100% { transform: translateX(0) rotate(0deg); }
-      25% { transform: translateX(-10px) rotate(-5deg); }
-      75% { transform: translateX(10px) rotate(5deg); }
-    }
-    
-    @keyframes shimmer {
-      0% { left: -100%; }
-      100% { left: 100%; }
-    }
-    
-    @keyframes fadeInOut {
-      0% { opacity: 0; transform: translateY(10px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-    
-    @media (max-width: 600px) {
-      .loading-title { font-size: 2.5rem; }
-      .loading-cat { font-size: 3rem; }
-      .loading-progress { width: 250px; }
-    }
-
-    /* 原有样式 */
+    /* New Chinese-style fonts */
     @font-face {
         font-family: 'HanyiSentyLotus';
         src: url('https://fonts.cdnfonts.com/s/72921/hanyisentyjilian.woff') format('woff');
@@ -140,6 +18,31 @@
         src: local('FangSong'), local('方正仿宋简体'), local('FZFSJW');
         font-weight: normal;
         font-style: normal;
+    }
+ #start-screen {
+      position: absolute;
+      left: 0; right: 0; top: 0; bottom: 0;
+      z-index: 88;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-size: 1.3rem;
+      border-radius: 25px;
+      text-align: center;
+      overflow: hidden; /* 确保背景图不会超出容器 */
+    }
+
+    /* 添加背景图容器 */
+    #start-screen::before {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; top: 0; bottom: 0;
+      background-image: url('mao.webp'); /* 使用与body相同的背景图 */
+      background-size: cover;
+      background-position: center;
+      opacity: 0.2; /* 设置透明度20% */
+      z-index: -1; /* 确保背景在内容后面 */
     }
     body {
       margin: 0;
@@ -457,16 +360,6 @@
       border-radius: 25px;
       text-align: center;
     }
-    #start-screen::before {
-      content: "";
-      position: absolute;
-      left: 0; right: 0; top: 0; bottom: 0;
-      background-image: url('mao.webp');
-      background-size: cover;
-      background-position: center;
-      opacity: 0.2;
-      z-index: -1;
-    }
     #start-screen h1 {
       font-size: 3.2rem;
       margin: 0 0 25px 0;
@@ -512,9 +405,9 @@
       background: rgba(255,243,245,0.99);
       border-radius: 25px;
       position: absolute;
-      overflow: hidden;
-      border: 3px solid #8B4513;
-      box-shadow: 0 5px 25px rgba(100, 60, 40, 0.3);
+      overflow: hidden; /* 确保背景图不超出容器 */
+      border: 3px solid #8B4513; /* 与游戏容器边框一致 */
+      box-shadow: 0 5px 25px rgba(100, 60, 40, 0.3); /* 与游戏容器阴影一致 */
     }
     #level-finish::before, #game-over::before {
       content: "";
@@ -523,12 +416,12 @@
       right: 0;
       top: 0;
       bottom: 0;
-      background-image: url('mao1.webp');
+      background-image: url('mao1.webp'); /* 使用与开始界面相同的背景图 */
       background-size: cover;
       background-position: center;
-      opacity: 0.2;
-      z-index: -1;
-    }
+      opacity: 0.2; /* 透明度20% */
+      z-index: -1; /* 确保背景在内容下方 */
+}
     #level-finish button, #game-over button {
       margin-top: 25px;
       padding: 12px 35px;
@@ -617,7 +510,8 @@
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0,0,0,0.6);
-        z-index: 2500;
+        /* 修复问题：增加z-index值确保模态框在最上层 */
+        z-index: 2500; /* 原值为1000 */
         display: none;
         align-items: center;
         justify-content: center;
@@ -664,6 +558,72 @@
     }
     /* --- End Modal Styles --- */
 
+    /* --- Loading Screen Styles --- */
+    #loading-screen {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: url('mao3.webp') no-repeat center center;
+      background-size: cover;
+      transition: opacity 0.5s ease-out;
+    }
+    #loading-screen::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: #f7f0e8; /* Game's main background color */
+      opacity: 0.9;
+      z-index: 1;
+    }
+    .loading-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      width: 80%;
+      max-width: 500px;
+    }
+    .loading-title {
+      font-size: 3.2rem;
+      margin: 0 0 40px 0;
+      color: #8B4513;
+      font-family: 'HanyiSentyLotus', 'Comic Sans MS', cursive;
+      letter-spacing: 3px;
+      text-shadow: 2px 2px 0 #f7e9d7, 4px 4px 0 #b8860b;
+    }
+    .progress-bar-container {
+      width: 100%;
+      height: 20px;
+      background: rgba(184, 134, 11, 0.2);
+      border-radius: 10px;
+      border: 2px solid #b8860b;
+      overflow: hidden;
+      margin-bottom: 15px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    }
+    #progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #a0c388, #88b368);
+      border-radius: 8px;
+      transition: width 0.3s ease-out;
+    }
+    #loading-text {
+      font-size: 1.1rem;
+      color: #5d4037;
+      margin-bottom: 40px;
+      min-height: 20px;
+    }
+    .loading-footer {
+      font-size: 1rem;
+      color: #8B4513;
+      font-family: 'FangSong', 'Comic Sans MS', cursive;
+      letter-spacing: 1.5px;
+      text-shadow: 0.5px 0.5px 0 rgba(255,255,255,0.5);
+    }
+    /* --- End Loading Screen Styles --- */
 
     @media (max-width: 500px) {
       #card-stack-area, #temp-area, #tools-bar, #code-bar { width: 98vw; }
@@ -713,16 +673,15 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
 <div id="loading-screen">
-  <div class="loading-title">喵了个咪 🐾</div>
-  <div class="loading-cat">🐈</div>
-  <div class="loading-progress">
-    <div class="progress-bar" id="progress-bar"></div>
+  <div class="loading-content">
+    <h1 class="loading-title">喵了个咪 🐾</h1>
+    <div class="progress-bar-container">
+      <div id="progress-bar"></div>
+    </div>
+    <p id="loading-text">正在加载资源...</p>
+    <small class="loading-footer">喵了个咪 &copy; 2025 | Designed by 开元</small>
   </div>
-  <div class="progress-percentage" id="progress-percentage">0%</div>
-  <div class="loading-text" id="loading-text">正在加载游戏资源...</div>
-  <div class="loading-footer">喵了个咪 &copy; 2025 | Designed by 开元</div>
 </div>
 
 <div id="game-container">
@@ -763,7 +722,7 @@
     <small>喵了个咪 &copy; 2025 | Designed by 开元</small>
   </div>
   <div id="level-finish" style="display:none;">
-    <div id="player">
+ <div id="player">
         <div id="player-content1">
             <div class="music-name"></div>
             <div class="artist-name"></div>
@@ -814,172 +773,15 @@
   </div>
 </div>
 
-<div style="display: none;">
-  <audio id="bgm" src="Get.mp3" loop preload="auto"></audio>
-  <audio id="click-sound" src="bullt.mp3" preload="auto"></audio>
-  <img id="preload-cat1" src="cat1.webp" alt="预加载">
-  <img id="preload-mao" src="mao.webp" alt="预加载">
-  <img id="preload-mao1" src="mao1.webp" alt="预加载">
-</div>
 
-<script src="js/jquery-3.4.1.min.js"></script>
-<script src="js/index.js"></script>
+<audio id="bgm" src="Get.mp3" loop preload="auto"></audio>
+<audio id="click-sound" src="bullt.mp3" preload="auto"></audio>
+ <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="js/index.js"></script>
 <script>
-// 加载管理器
-class LoadingManager {
-  constructor() {
-    this.resources = [
-      { type: 'audio', src: 'Get.mp3', name: '背景音乐' },
-      { type: 'audio', src: 'bullt.mp3', name: '点击音效' },
-      { type: 'image', src: 'cat1.webp', name: '背景图片' },
-      { type: 'image', src: 'mao.webp', name: '猫咪图片' },
-      { type: 'image', src: 'mao1.webp', name: '结束图片' }
-    ];
-    this.loadedCount = 0;
-    this.totalCount = this.resources.length;
-    this.loadingTexts = [
-      '正在加载游戏资源',
-      '初始化猫咪引擎',
-      '准备喵喵音效',
-      '加载游戏关卡',
-      '检查猫爪灵敏度',
-      '设置游戏难度',
-      '校准虚拟沙盒',
-      '准备完成，即将开始'
-    ];
-    this.currentTextIndex = 0;
-    // Cache DOM elements for efficiency
-    this.progressBar = document.getElementById('progress-bar');
-    this.progressPercentage = document.getElementById('progress-percentage');
-    this.loadingTextElement = document.getElementById('loading-text');
-    this.loadingScreenElement = document.getElementById('loading-screen');
-  }
-
-  async startLoading() {
-    // Show loading screen immediately for instant feedback
-    this.loadingScreenElement.style.display = 'flex';
-    
-    // Start text animation concurrently
-    this.startTextAnimation();
-    
-    // Preload all resources in parallel
-    const loadPromises = this.resources.map(resource => this.loadResource(resource));
-    
-    try {
-      await Promise.all(loadPromises);
-      
-      // Ensure the final loading text and 100% progress are displayed
-      this.updateLoadingText(this.loadingTexts.length - 1);
-      this.updateProgress(100);
-      
-      // Add a small delay so the user can see 100% progress
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Fade out and hide the loading screen
-      this.hideLoadingScreen();
-      
-    } catch (error) {
-      console.error('资源加载失败:', error);
-      // Ensure the loading screen is hidden even if some resources fail
-      this.hideLoadingScreen();
-    }
-  }
-
-  loadResource(resource) {
-    return new Promise((resolve) => { // Resolve even on error to prevent blocking
-      let element;
-      
-      if (resource.type === 'audio') {
-        element = new Audio();
-        element.preload = 'auto'; // Ensure audio is preloaded
-        // Add a timeout for audio loading to prevent indefinite waits
-        const timeout = setTimeout(() => {
-            console.warn(`音频资源 ${resource.src} 加载超时.`);
-            this.onResourceLoaded();
-            resolve();
-        }, 5000); // 5 seconds timeout for audio
-
-        element.oncanplaythrough = () => {
-            clearTimeout(timeout);
-            this.onResourceLoaded();
-            resolve();
-        };
-      } else if (resource.type === 'image') {
-        element = new Image();
-        element.onload = () => {
-          this.onResourceLoaded();
-          resolve();
-        };
-      }
-      
-      // Handle errors for both audio and images consistently
-      element.onerror = () => {
-        console.warn(`加载资源失败: ${resource.src}`);
-        this.onResourceLoaded(); // Update progress even if resource fails
-        if (resource.type === 'audio') clearTimeout(timeout); // Clear timeout for audio errors
-        resolve(); // Resolve to allow Promise.all to complete
-      };
-      
-      element.src = resource.src;
-    });
-  }
-
-  onResourceLoaded() {
-    this.loadedCount++;
-    const progress = Math.round((this.loadedCount / this.totalCount) * 100);
-    this.updateProgress(progress);
-  }
-
-  updateProgress(percentage) {
-    if (this.progressBar) {
-      this.progressBar.style.width = percentage + '%';
-    }
-    if (this.progressPercentage) {
-      this.progressPercentage.textContent = percentage + '%';
-    }
-  }
-
-  startTextAnimation() {
-    const updateText = () => {
-      if (this.currentTextIndex < this.loadingTexts.length) {
-        this.updateLoadingText(this.currentTextIndex);
-        this.currentTextIndex++;
-        setTimeout(updateText, 700); // Slightly reduced interval for faster text changes
-      }
-    };
-    updateText();
-  }
-
-  updateLoadingText(index) {
-    if (this.loadingTextElement && index < this.loadingTexts.length) {
-      this.loadingTextElement.textContent = this.loadingTexts[index];
-      // Re-trigger the CSS animation for fade-in effect
-      this.loadingTextElement.style.animation = 'none';
-      void this.loadingTextElement.offsetWidth; // Force reflow to restart animation
-      this.loadingTextElement.style.animation = 'fadeInOut 1s ease-in-out';
-    }
-  }
-
-  hideLoadingScreen() {
-    if (this.loadingScreenElement) {
-      this.loadingScreenElement.classList.add('fade-out');
-      setTimeout(() => {
-        this.loadingScreenElement.style.display = 'none';
-      }, 500); // Matches the CSS transition duration for a smooth fade out
-    }
-  }
-}
-
-// 页面加载完成后启动加载管理器
-window.addEventListener('DOMContentLoaded', () => { // Changed to DOMContentLoaded for earlier execution
-  const loadingManager = new LoadingManager();
-  loadingManager.startLoading();
-});
-
-// 原有的游戏逻辑代码
 const CARD_ICONS = [
   "🐈", "💐", "🧩", "👒", "🏵️", "🧸", "🍬", "🔮", "🎡", "🪙", "🚵‍♀️", "🪭",
-  "🐖", "🧶", "🌻", "✂️", "🦋", "🍄"  
+  "🐖", "🧶", "🌻", "✂️", "🦋", "🍄"
 ];
 const LEVELS = [
   {num: 1, visible: 18, total: 21, stack: 1, rows: 3, cols: 6, overlap: 30},
@@ -987,6 +789,12 @@ const LEVELS = [
 ];
 const TEMP_LIMIT = 7;
 
+/*
+* MODIFICATION START: Replaced single code with an object for multiple codes.
+* You can now add, remove, or change codes and their rewards here.
+* The key is the redemption code (in lowercase).
+* The value is an object specifying the counts for each tool.
+*/
 const REDEMPTION_CODES = {
   "kaiyuan": { undo: 20, hint: 20, shuffle: 20 },
   "兑换码": { undo: 5, hint: 5, shuffle: 5 },
@@ -994,6 +802,7 @@ const REDEMPTION_CODES = {
   "不知道": { undo: 3, hint: 1, shuffle: 1 },
   "开元": { undo: 10, hint: 10, shuffle: 10 }
 };
+// MODIFICATION END
 
 const bgm = document.getElementById('bgm');
 const clickSound = document.getElementById('click-sound');
@@ -1016,7 +825,7 @@ let game = {
   progress: 0,
   stepStack: [],
   bgmOn: true,
-  lock: false
+  lock: false // This lock prevents multiple clicks causing issues
 };
 
 function randArr(arr) {
@@ -1081,11 +890,11 @@ confirmNo.onclick = hideConfirm;
 
 function genLevel(levelIdx){
   const lv = LEVELS[levelIdx-1];
-  
+
   let allIcons = [];
   const requiredUniqueIcons = Math.ceil(lv.total / 3);
-  let availableIcons = randArr(CARD_ICONS); 
-  availableIcons = availableIcons.slice(0, Math.min(availableIcons.length, requiredUniqueIcons + 2)); 
+  let availableIcons = randArr(CARD_ICONS);
+  availableIcons = availableIcons.slice(0, Math.min(availableIcons.length, requiredUniqueIcons + 2));
 
   let iconPool = [];
   for (let i = 0; i < requiredUniqueIcons; i++) {
@@ -1128,14 +937,14 @@ function genLevel(levelIdx){
 
   for (let cardIdx = 0; cardIdx < lv.total; cardIdx++) {
     const s = Math.min(Math.floor(cardIdx / cardsPerStackLayer), stackDepth - 1);
-    
+
     let x = 0, y = 0;
     let maxAttempts = 50;
     let foundPosition = false;
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       let tempX = randBetween(5, areaW - cardW - 5);
       let tempY = randBetween(5, areaH - cardH - 5);
-      
+
       tempX += (s * 5 * (Math.random() - 0.5));
       tempY += (s * 5 * (Math.random() - 0.5));
 
@@ -1161,7 +970,7 @@ function genLevel(levelIdx){
         break;
       }
     }
-    
+
     if (!foundPosition) {
         x = randBetween(5, areaW - cardW - 5);
         y = randBetween(5, areaH - cardH - 5);
@@ -1178,21 +987,21 @@ function genLevel(levelIdx){
       stack: s
     });
   }
-  
+
   board.sort((a, b) => a.z - b.z);
-  
+
   return {cards, board, usedIcons: availableIcons.slice(0, Math.ceil(lv.total/3))};
 }
 
 function isCardClickable(card, board){
   if(card.matched) return false;
-  
+
   const activeCards = board.filter(c => !c.matched);
 
   const cardW = (game.level === 2) ? 50 : 65;
   const cardH = (game.level === 2) ? 65 : 85;
-  const overlapThresholdX = cardW * 0.7; 
-  const overlapThresholdY = cardH * 0.7; 
+  const overlapThresholdX = cardW * 0.7;
+  const overlapThresholdY = cardH * 0.7;
 
   for (const otherCard of activeCards) {
     if (card.id === otherCard.id) {
@@ -1216,9 +1025,9 @@ function clickCard(id) {
   if (game.lock) return;
 
   let cardData = game.board.find(c => c.id === id);
-  
+
   if (!cardData || cardData.matched || !isCardClickable(cardData, game.board)) return;
-  
+
   let tempCheck = [...game.temp, { icon: cardData.icon, id: cardData.id }];
   let iconCntCheck = {};
   tempCheck.forEach(c => iconCntCheck[c.icon] = (iconCntCheck[c.icon] || 0) + 1);
@@ -1230,7 +1039,7 @@ function clickCard(id) {
   }
 
   saveStep();
-  game.lock = true; 
+  game.lock = true;
 
   const clickedCardEl = document.querySelector(`#card-stack-area .card[data-id='${id}']`);
   if (!clickedCardEl) {
@@ -1239,7 +1048,7 @@ function clickCard(id) {
   }
 
   const startRect = clickedCardEl.getBoundingClientRect();
-  
+
   const flyingCard = document.createElement('div');
   flyingCard.className = 'flying-card';
   flyingCard.innerHTML = cardData.icon;
@@ -1255,15 +1064,15 @@ function clickCard(id) {
 
   playClickSound();
 
-  const animationDuration = 150; 
-  const tempAppearanceDelay = 80; 
+  const animationDuration = 150;
+  const tempAppearanceDelay = 80;
 
   requestAnimationFrame(() => {
     const tempForPositionCalculation = [...game.temp, { icon: cardData.icon, id: cardData.id }];
     tempForPositionCalculation.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
     const endSlotIndex = tempForPositionCalculation.findIndex(c => c.id === id);
     const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
-    
+
     if (endSlotIndex < 0 || endSlotIndex >= tempSlots.length) {
         console.error("Invalid end slot index calculated for flying card. Aborting animation.");
         document.body.removeChild(flyingCard);
@@ -1289,13 +1098,13 @@ function clickCard(id) {
   }, animationDuration);
 
   setTimeout(() => {
-    cardData.matched = true; 
+    cardData.matched = true;
     game.temp.push({ icon: cardData.icon, id: cardData.id, matched: false });
     game.temp.sort((a, b) => a.icon.localeCompare(b.icon) || a.id - b.id);
-    
-    renderTemp(); 
-    renderBoard(); 
-    renderProgress(); 
+
+    renderTemp();
+    renderBoard();
+    renderProgress();
 
     let iconCnt = {};
     game.temp.forEach(c => {
@@ -1311,11 +1120,11 @@ function clickCard(id) {
         renderTemp();
         renderBoard();
         checkWin();
-        game.lock = false; 
-      }, 100); 
+        game.lock = false;
+      }, 100);
     } else {
-      checkWin(); 
-      game.lock = false; 
+      checkWin();
+      game.lock = false;
     }
   }, tempAppearanceDelay);
 }
@@ -1354,7 +1163,7 @@ function shuffleStep(){
   let unmatched = game.board.filter(c=>!c.matched);
   let icons = unmatched.map(c=>c.icon);
   shuffle(icons);
-  
+
   unmatched.forEach((c,i)=>{
       c.icon = icons[i];
   });
@@ -1408,7 +1217,7 @@ function hintStep(){
         }
       }
     }
-    
+
     showMessage('已高亮可消除三张');
     setTimeout(renderAll, 1700);
   } else {
@@ -1419,7 +1228,7 @@ function hintStep(){
 function gameOver(msg){
   game.lock=true;
   document.getElementById('card-stack-area').innerHTML = '';
-  document.querySelectorAll('#temp-area .temp-slot').forEach(slot => slot.innerHTML = '';
+  document.querySelectorAll('#temp-area .temp-slot').forEach(slot => slot.innerHTML = '');
   document.getElementById('progress-info').textContent = '';
   document.getElementById('message-bar').textContent = '';
 
@@ -1451,11 +1260,11 @@ function startGame(level){
   renderAll();
   updateToolButtons();
   if (level === 2) {
-    game.bgmOn = false; 
-    document.getElementById('music-toggle').innerHTML = '🔇'; 
-    playBgm(false); 
+    game.bgmOn = false;
+    document.getElementById('music-toggle').innerHTML = '🔇';
+    playBgm(false);
   } else {
-    playBgm(game.bgmOn); 
+    playBgm(game.bgmOn);
   }
 }
 
@@ -1463,8 +1272,8 @@ function renderBoard(){
   const area = document.getElementById('card-stack-area');
   area.innerHTML = '';
   let cardsToRender = game.board.filter(c => !c.matched);
-  
-  cardsToRender.sort((a, b) => a.z - b.z); 
+
+  cardsToRender.sort((a, b) => a.z - b.z);
 
   cardsToRender.forEach(card=>{
     let el = document.createElement('div');
@@ -1475,7 +1284,7 @@ function renderBoard(){
     el.style.zIndex = card.z;
     el.innerHTML = card.icon;
     el.dataset.id = card.id;
-    
+
     if(clickable){
       el.onclick = ()=>clickCard(card.id);
     }
@@ -1554,15 +1363,22 @@ document.getElementById('restart-btn').onclick = function() {
     });
 };
 
+/*
+* MODIFICATION START: Updated the code redemption logic.
+* This function now checks the input against the REDEMPTION_CODES object.
+*/
 document.getElementById('code-btn').onclick=function(){
   let val = document.getElementById('code-input').value.trim().toLowerCase();
-  
+
   if (REDEMPTION_CODES[val]) {
     const rewards = REDEMPTION_CODES[val];
     game.toolUses.undo += rewards.undo;
     game.toolUses.hint += rewards.hint;
     game.toolUses.shuffle += rewards.shuffle;
-    
+
+    // Optional: Add a check to prevent reusing codes
+    // delete REDEMPTION_CODES[val];
+
     showMessage(`兑换成功！获得撤销x${rewards.undo}, 提示x${rewards.hint}, 洗牌x${rewards.shuffle}`, "#3e5a2b");
     updateToolButtons();
   } else {
@@ -1570,6 +1386,7 @@ document.getElementById('code-btn').onclick=function(){
   }
   document.getElementById('code-input').value='';
 };
+// MODIFICATION END
 
 document.getElementById('music-toggle').onclick=function(){
   game.bgmOn = !game.bgmOn;
@@ -1596,24 +1413,68 @@ function showLevelFinish(msg){
   document.getElementById('level-finish').style.display='flex';
   document.getElementById('level-finish-text').innerHTML=msg;
   document.getElementById('next-btn').style.display = (game.level===1)?'inline-block':'none';
-  playBgm(false); 
+  playBgm(false);
 }
 document.getElementById('next-btn').onclick = function(){
       document.getElementById('level-finish').style.display='none';
       startGame(2);
-      playBgm(game.bgmOn); 
+      playBgm(game.bgmOn);
     };
 
     document.getElementById('retry-btn').onclick = function(){
       document.getElementById('level-finish').style.display='none';
       startGame(game.level);
-      playBgm(game.bgmOn); 
+      playBgm(game.bgmOn);
     };
-window.onload=function(){
+
+// Modified this function to be callable later
+function initializeGame(){
   document.getElementById('music-toggle').innerHTML = game.bgmOn?'🎼':'🔇';
   updateToolButtons();
   footer.style.display = 'none';
 }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const loadingScreen = document.getElementById('loading-screen');
+    const progressBar = document.getElementById('progress-bar');
+    const loadingText = document.getElementById('loading-text');
+
+    let progress = 0;
+    const assets = ["加载字体...", "加载音效...", "加载图片...", "初始化关卡...", "准备喵咪...", "完成!"];
+    let assetIndex = 0;
+    loadingText.textContent = assets[0];
+
+    const interval = setInterval(() => {
+        progress += Math.random() * 15 + 5;
+        
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            
+            progressBar.style.width = progress + '%';
+            loadingText.textContent = assets[assets.length - 1];
+
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                loadingScreen.addEventListener('transitionend', () => {
+                    loadingScreen.style.display = 'none';
+                }, { once: true });
+
+                // Initialize the game after the loading screen is gone
+                initializeGame();
+            }, 400);
+        } else {
+            progressBar.style.width = progress + '%';
+            const nextAssetThreshold = (assetIndex + 1) * 20;
+            if (progress > nextAssetThreshold && assetIndex < assets.length - 2) {
+                assetIndex++;
+                loadingText.textContent = assets[assetIndex];
+            }
+        }
+    }, 250);
+});
 </script>
 </body>
 </html>
