@@ -40,16 +40,16 @@
       80% { opacity: 1; }
       100% { opacity: 0; }
     }
-    @keyframes dropInFromTop {
-  0% {
-    transform: translateY(-100%); /* Start off-screen above */
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0); /* End at its natural position */
-    opacity: 1;
-  }
-}
+    @keyframes card-scale-up {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
  #start-screen {
       position: absolute;
       left: 0; right: 0; top: 0; bottom: 0;
@@ -184,7 +184,7 @@
       animation: show-card-property 2s forwards; /* Example duration and fill-mode */
     }
     .card.animate-entry {
-      animation: dropInFromTop 0.5s ease-out forwards; /* Adjust duration and timing as needed */
+      animation: card-scale-up 0.5s ease-out forwards; /* Adjust duration and timing as needed */
       animation-delay: var(--card-delay);
     }
     .card.selected {
