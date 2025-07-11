@@ -19,6 +19,16 @@
         font-weight: normal;
         font-style: normal;
     }
+    @keyframes pulse-scale {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+    @keyframes text-progress {
+  0% { content: "."; }
+  33% { content: ".."; }
+  66% { content: "..."; }
+  100% { content: "."; }
+}
  #start-screen {
       position: absolute;
       left: 0; right: 0; top: 0; bottom: 0;
@@ -35,7 +45,6 @@
       overflow: hidden; /* 确保背景图不会超出容器 */
       box-sizing: border-box;
     }
-
     /* 添加背景图容器 */
     #start-screen::before {
       content: "";
@@ -156,7 +165,6 @@
       z-index: 100 !important;
       transform: scale(1.1) rotate(-2deg);
     }
-
     .card.disabled {
       pointer-events: none;
       position: absolute;
@@ -477,7 +485,6 @@
       letter-spacing: 1.5px;
       text-shadow: 0.5px 0.5px 0 rgba(255,255,255,0.5);
     }
-
     /* --- Styles for Level 2 on ALL devices to reduce difficulty --- */
     body.level-2-active .card {
       width: 50px;
@@ -514,7 +521,6 @@
       height: 420px;
     }
     /* --- End new styles --- */
-
     /* --- Custom Confirm Modal Styles --- */
     .modal-overlay {
         position: fixed;
@@ -567,7 +573,6 @@
         background: #e9d9c6;
     }
     /* --- End Modal Styles --- */
-
     /* --- Loading Screen Styles --- */
     #loading-screen {
       position: fixed;
@@ -604,13 +609,18 @@
       box-sizing: border-box;
     }
     .loading-title {
-      font-size: 3.2rem;
-      margin: 0 0 40px 0;
-      color: #8B4513;
-      font-family: 'HanyiSentyLotus', 'Comic Sans MS', cursive;
-      letter-spacing: 3px;
-      text-shadow: 2px 2px 0 #f7e9d7, 4px 4px 0 #b8860b;
-    }
+  font-size: 3.2rem;
+  margin: 0 0 40px 0;
+  color: #8B4513;
+  font-family: 'HanyiSentyLotus', 'Comic Sans MS', cursive;
+  letter-spacing: 3px;
+  text-shadow: 2px 2px 0 #f7e9d7, 4px 4px 0 #b8860b;
+  animation: pulse-scale 1.5s infinite ease-in-out;
+}
+    .loading-title::after {
+  content: ".";
+  animation: text-progress 2s infinite;
+}
     .progress-bar-container {
       width: 100%;
       height: 20px;
