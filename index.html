@@ -29,11 +29,6 @@
   66% { content: "..."; }
   100% { content: "."; }
 }
-    @keyframes wave {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  25% { transform: translateY(-10px) rotate(2deg); }
-  75% { transform: translateY(5px) rotate(-1deg); }
-}
  #start-screen {
       position: absolute;
       left: 0; right: 0; top: 0; bottom: 0;
@@ -377,23 +372,13 @@
       text-align: center;
     }
     #start-screen h1 {
-  font-size: 3.2rem;
-  margin: 0 0 25px 0;
-  color: #8B4513;
-  font-family: 'HanyiSentyLotus', 'Comic Sans MS', cursive;
-  letter-spacing: 3px;
-  text-shadow: 2px 2px 0 #f7e9d7, 4px 4px 0 #b8860b;
-  display: inline-block;
-}
-    #start-screen h1 span {
-  display: inline-block;
-  animation: wave 1.5s infinite ease-in-out;
-}
-#start-screen h1 span:nth-child(1) { animation-delay: -0.4s; }
-#start-screen h1 span:nth-child(2) { animation-delay: -0.2s; }
-#start-screen h1 span:nth-child(3) { animation-delay: 0s; }
-#start-screen h1 span:nth-child(4) { animation-delay: 0.2s; }
-#start-screen h1 span:nth-child(5) { animation-delay: 0.4s; } /* 针对最后的emoji */
+      font-size: 3.2rem;
+      margin: 0 0 25px 0;
+      color: #8B4513;
+      font-family: 'HanyiSentyLotus', 'Comic Sans MS', cursive;
+      letter-spacing: 3px;
+      text-shadow: 2px 2px 0 #f7e9d7, 4px 4px 0 #b8860b;
+    }
     #start-screen .start-btn {
       margin-top: 30px;
       padding: 15px 50px;
@@ -764,9 +749,7 @@
     <div id="message-bar"></div>
   </div>
   <div id="start-screen">
-  <h1><span>喵</span><span>了</span><span>个</span><span>咪</span><span> 🐾</span></h1>
-  <!-- 其他内容保持不变 -->
-  </div>
+    <h1>喵了个咪 🐾</h1>
     <p>
       <p>
       <button class="start-btn" id="start-btn">开始游戏</button>
