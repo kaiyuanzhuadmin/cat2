@@ -35,10 +35,20 @@
       75% { transform: translateY(5px) rotate(-1deg); }
     }
     @keyframes show-card-property {
-  0% { opacity: 0; }
-  20% { opacity: 1; }
-  80% { opacity: 1; }
-  100% { opacity: 0; }
+      0% { opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    @keyframes dropInFromTop {
+  0% {
+    transform: translateY(-100%); /* Start off-screen above */
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0); /* End at its natural position */
+    opacity: 1;
+  }
 }
  #start-screen {
       position: absolute;
@@ -172,7 +182,11 @@
     }
     .hint-animation {
       animation: show-card-property 2s forwards; /* Example duration and fill-mode */
-}
+    }
+    .card.animate-entry {
+      animation: dropInFromTop 0.5s ease-out forwards; /* Adjust duration and timing as needed */
+      animation-delay: var(--card-delay);
+    }
     .card.selected {
       border: 3.5px solid #a0522d;
       box-shadow: 0 4px 20px rgba(160, 82, 45, 0.4), 0 0 25px rgba(255,255,0,0.5);
@@ -1348,7 +1362,7 @@ function renderBoard(){
 
   cardsToRender.sort((a, b) => a.z - b.z);
 
-  cardsToRender.forEach(card=>{
+  cardsToRender.forEach((card, index) => {
     let el = document.createElement('div');
     const clickable = isCardClickable(card, game.board);
     el.className = "card" + (clickable ? "" : " disabled");
@@ -1357,7 +1371,10 @@ function renderBoard(){
     el.style.zIndex = card.z;
     el.innerHTML = card.icon;
     el.dataset.id = card.id;
-
+    // Add the animation class
+    el.classList.add('animate-entry');
+    // Set a custom property for staggered delay
+    el.style.setProperty('--card-delay', `${index * 0.03}s`); // 30ms delay per card
     if(clickable){
       el.onclick = ()=>clickCard(card.id);
     }
