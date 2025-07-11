@@ -505,7 +505,7 @@ body::after {
       overflow: hidden; /* 确保背景图不超出容器 */
       border: 3px solid #8B4513; /* 与游戏容器边框一致 */
       box-shadow: 0 5px 25px rgba(100, 60, 40, 0.3); /* 与游戏容器阴影一致 */
-      animation: shake 3s infinite; /* Add these lines */
+      /*animation: shake 3s infinite; /* Add these lines */
     }
 
     #game-over {
@@ -1633,7 +1633,7 @@ function showLevelFinish(msg){
 
   // 根据关卡设置不同的动画效果
   if (game.level === 1) {
-    levelFinishTextElement.style.animation = 'show-card-property 4s forwards';
+    levelFinishTextElement.style.animation = 'shake 3s infinite show-card-property 8s forwards';
     levelFinishTextElement.innerHTML += '<br>第二关后会有彩蛋🪅！'; // 保持第一关的彩蛋提示
   } else if (game.level === 2) {
     levelFinishTextElement.style.animation = 'pulse-scale 2s infinite alternate, wave 2s infinite'; // 第二关使用新的动画
