@@ -697,11 +697,11 @@ body::after {
       background: #f7f0e8 url('mao3.webp') no-repeat center center fixed;
       background-size: cover;
       opacity: 0.6;/*不透明度60%
-      z-index: 1;
+      z-index: -1;
     }
     .loading-content {
       position: relative;
-      z-index: 2;
+      z-index: 1;
       text-align: center;
       width: 80%;
       max-width: 500px;
@@ -738,8 +738,7 @@ body::after {
       box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
       /* MODIFIED: Pushed down from the title */
       margin-top: 40vh;
-      z-index: 2;
-      text-align: center;
+      z-index: 4;
     }
     #progress-bar {
       width: 0%;
@@ -820,7 +819,7 @@ body::after {
 <body>
 <div id="loading-screen">
   <div class="loading-content">
-    <h1 class="loading-title">Loading...</h1>
+    <h1 class="loading-title">Loading.</h1>
     <div class="progress-bar-container">
       <div id="progress-bar"></div>
     </div>
