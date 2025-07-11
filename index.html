@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-  <title>喵了个咪</title>
+  <title>宝，加载中...</title>
   <link rel="icon" type="image/png" sizes="96x96" href="me.png">
   <style>
     /* New Chinese-style fonts */
@@ -1462,6 +1462,7 @@ function initializeGame(){
 </script>
 
 <script>
+// 修改点2：在DOM加载完成事件中添加标题修改逻辑
 document.addEventListener('DOMContentLoaded', () => {
     const loadingScreen = document.getElementById('loading-screen');
     const progressBar = document.getElementById('progress-bar');
@@ -1486,10 +1487,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadingScreen.style.opacity = '0';
                 loadingScreen.addEventListener('transitionend', () => {
                     loadingScreen.style.display = 'none';
+                    // 关键修改：在加载完成后将标题修改为"喵了个咪"
+                    document.title = "喵了个咪";
+                    initializeGame();
                 }, { once: true });
-
-                // Initialize the game after the loading screen is gone
-                initializeGame();
             }, 400);
         } else {
             progressBar.style.width = progress + '%';
