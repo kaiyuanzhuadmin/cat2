@@ -73,13 +73,35 @@
     }
     body {
       margin: 0;
-      background: #f7f0e8 url('cat1.webp') no-repeat center center fixed;
-      background-size: cover;
       min-height: 100vh;
       overflow-x: hidden;
       font-family: 'FangSong', 'Segoe UI', 'PingFang SC', 'Helvetica Neue', Arial, 'Microsoft Yahei', sans-serif;
       color: #3e2723;
+      position: relative; /* 关键：为伪元素提供定位参考 */
     }
+    body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #f7f0e8 url('cat1.webp') no-repeat center center fixed;
+  background-size: cover;
+  z-index: -2; /* 置于内容下方 */
+}
+
+body::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  opacity: 0.3; /* 30%透明度的白色蒙版 */
+  z-index: -1; /* 置于背景图上方、内容下方 */
+}
     #game-container {
       max-width: 650px;
       margin: 30px auto;
@@ -451,7 +473,8 @@
         text-align: center;
     }
     #level-finish, #game-over {
-      font-size: 2rem;
+      font-size: 1.8rem;
+      font-family: 'Segoe UI', 'PingFang SC', 'Helvetica Neue', Arial, 'Microsoft Yahei', sans-serif;
       color: #5d4037;
       background: rgba(255,243,245,0.99);
       border-radius: 25px;
@@ -1570,7 +1593,7 @@ document.getElementById('close-game-btn-level').onclick = function() {
         // Fallback or message if window.close() fails
         setTimeout(() => {
             document.getElementById('game-container').style.display = 'none';
-            document.body.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-size:2em; color:#5d4037; text-align:center;opacity: 0.5;">感谢游玩！无法自动关闭页面，请手动关闭。<br><br><small style="font-size:0.5em;">喵了个咪 &copy; 2025 | Designed by 开元</small></div>';
+            document.body.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-size:2em; color:#5d4037; text-align:center;opacity: 1;">感谢游玩！无法自动关闭页面，请手动关闭。<br><br><small style="font-size:0.5em;">喵了个咪 &copy; 2025 | Designed by 开元</small></div>';
         }, 100); // Give a small delay to allow window.close() to attempt
     });
 };
