@@ -6,6 +6,12 @@
   <title>臭宝加载中...</title>
   <link rel="icon" type="image/png" sizes="96x96" href="me.png">
   <style>
+@keyframes card-entry {
+  0% { opacity: 0; transform: scale(0.5) translateY(-50px); }
+  70% { opacity: 1; transform: scale(1.05) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
     /* New Chinese-style fonts */
     @font-face {
         font-family: 'HanyiSentyLotus';
@@ -201,6 +207,10 @@ body::after {
       overflow: hidden;
       color: #5d4037;
     }
+    .card-entering {
+  animation: card-entry 0.5s ease-out forwards; /* Adjust duration and easing as needed */
+  /* Add a delay based on index for a staggered effect */
+}
     .hint-animation {
       animation: show-card-property 2s forwards; /* Example duration and fill-mode */
 }
@@ -477,7 +487,7 @@ body::after {
         right: 0;
         text-align: center;
     }
-    #level-finish, #game-over {
+    #level-finish {
       font-size: 1.8rem;
       font-family: 'Segoe UI', 'PingFang SC', 'Helvetica Neue', Arial, 'Microsoft Yahei', sans-serif;
       color: #5d4037;
@@ -487,6 +497,20 @@ body::after {
       overflow: hidden; /* 确保背景图不超出容器 */
       border: 3px solid #8B4513; /* 与游戏容器边框一致 */
       box-shadow: 0 5px 25px rgba(100, 60, 40, 0.3); /* 与游戏容器阴影一致 */
+      animation: shake 2s infinite; /* Add these lines */
+    }
+
+    #game-over {
+      font-size: 1.8rem;
+      font-family: 'Segoe UI', 'PingFang SC', 'Helvetica Neue', Arial, 'Microsoft Yahei', sans-serif;
+      color: #5d4037;
+      background: rgba(255,243,245,0.99);
+      border-radius: 25px;
+      position: absolute;
+      overflow: hidden; /* 确保背景图不超出容器 */
+      border: 3px solid #8B4513; /* 与游戏容器边框一致 */
+      box-shadow: 0 5px 25px rgba(100, 60, 40, 0.3); /* 与游戏容器阴影一致 */
+      animation: wave 2s infinite; /* Add these lines */
     }
     #level-finish::before, #game-over::before {
       content: "";
@@ -940,6 +964,7 @@ let game = {
   progress: 0,
   stepStack: [],
   bgmOn: true,
+  isNewLevel: false, // Add this flag
   lock: false // This lock prevents multiple clicks causing issues
 };
 
@@ -1421,6 +1446,7 @@ function startGame(level){
   game.toolUses = {undo: 0, hint: 0, shuffle: 0};
   game.stepStack = [];
   game.lock = false;
+  game.isNewLevel = true; // Set the flag here
   renderAll();
   updateToolButtons();
   playBgm(game.bgmOn);
@@ -1433,7 +1459,9 @@ function renderBoard(){
 
   cardsToRender.sort((a, b) => a.z - b.z);
 
-  cardsToRender.forEach(card=>{
+  const isInitialRenderForLevel = game.isNewLevel; // Capture the state
+
+  cardsToRender.forEach((card, index) => { // Add index to the loop
     let el = document.createElement('div');
     const clickable = isCardClickable(card, game.board);
     el.className = "card" + (clickable ? "" : " disabled");
@@ -1446,8 +1474,19 @@ function renderBoard(){
     if(clickable){
       el.onclick = ()=>clickCard(card.id);
     }
+     if (isInitialRenderForLevel) {
+        el.classList.add('card-entering');
+        el.style.animationDelay = `${index * 0.03}s`; // Stagger animation
+        el.addEventListener('animationend', function handler() {
+            el.classList.remove('card-entering');
+            el.style.animationDelay = ''; // Clean up
+            el.removeEventListener('animationend', handler);
+        }, { once: true });
+    }
+
     area.appendChild(el);
   });
+  game.isNewLevel = false; // Reset the flag after rendering
 }
 function renderTemp(){
   const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
