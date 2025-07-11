@@ -45,6 +45,11 @@
       50% { opacity: 1; transform: scale(1); }
       100% { opacity: 0; transform: scale(0.9); }
     }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-3px) rotate(-1deg); }
+      20%, 40%, 60%, 80% { transform: translateX(3px) rotate(1deg); }
+    }
  #start-screen {
       position: absolute;
       left: 0; right: 0; top: 0; bottom: 0;
@@ -577,6 +582,11 @@ body::after {
       height: 420px;
     }
     /* --- End new styles --- */
+    .hinted-shake {
+      animation: shake 0.5s ease-in-out 4; /* Adjust duration and iteration count as needed */
+      /* You can also add a subtle visual highlight here if you want it to persist during the shake */
+      /* For example: border-color: #e65c4f !important; box-shadow: 0 0 16px #ff8c69 !important; */
+    }
     /* --- Custom Confirm Modal Styles --- */
     .modal-overlay {
         position: fixed;
@@ -1296,17 +1306,32 @@ function hintStep(){
       break;
     }
   }
+  // Remove any existing hint animations/styles before applying new ones
+  document.querySelectorAll('.card.hinted-shake').forEach(el => {
+      el.classList.remove('hinted-shake');
+      el.style.borderColor = ''; // Reset if previously set by hint
+      el.style.boxShadow = '';  // Reset if previously set by hint
+  });
+  document.querySelectorAll('#temp-area .temp-card.hinted-shake').forEach(el => {
+      el.classList.remove('hinted-shake');
+      el.style.borderColor = ''; // Reset if previously set by hint
+      el.style.boxShadow = '';  // Reset if previously set by hint
+  });
 
   if (targetIcon) {
     let hintDone = 0;
     const tempSlots = document.querySelectorAll('#temp-area .temp-slot');
+    const hintedElements = []; // To keep track of elements that need animation
 
     for (let i = 0; i < game.temp.length && hintDone < 3; i++) {
       if (game.temp[i].icon === targetIcon && !game.temp[i].matched) {
         const tempCardElement = tempSlots[i].querySelector('.temp-card');
         if (tempCardElement) {
+          // Add the animation class
           tempCardElement.style.borderColor = '#e65c4f';
-          tempCardElement.style.boxShadow = '0 0 16px #ff8c69';
+          tempCardElement.style.boxShadow = '0 0 16px #ff8c69';          
+          tempCardElement.classList.add('hinted-shake');
+          hintedElements.push(tempCardElement);
           hintDone++;
         }
       }
@@ -1317,19 +1342,26 @@ function hintStep(){
       if (boardCard.icon === targetIcon) {
         let doms = document.querySelector(`#card-stack-area .card[data-id='${boardCard.id}']`);
         if (doms) {
+          // Add the animation class
+          doms.classList.add('hinted-shake');
           doms.style.borderColor = '#e65c4f';
           doms.style.boxShadow = '0 0 16px #ff8c69';
+          hintedElements.push(doms);
           hintDone++;
-          doms.addEventListener('animationend', () => {
-          doms.classList.remove('hint-animation');
-    // You might also want to reset borderColor and boxShadow here if they are part of the animation
-  }, { once: true }); 
         }
       }
     }
 
-    showMessage('已高亮可消除三张');
-    setTimeout(renderAll, 1700);
+    showMessage('已提示可消除三张');
+
+    // Remove the animation class after a short duration
+    setTimeout(() => {
+        hintedElements.forEach(el => {
+            el.classList.remove('hinted-shake');
+            // Optionally reset border/shadow here if they were used for visual hint too
+        });
+        renderAll(); // Re-render to ensure styles are clean
+    }, 1200); // Animation duration + a little extra
   } else {
     showMessage('当前无可三消', "#888");
   }
