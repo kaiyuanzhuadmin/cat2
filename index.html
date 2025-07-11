@@ -791,7 +791,7 @@
     <small>喵了个咪 &copy; 2025 | Designed by 开元</small>
   </div>
   <div id="level-finish" style="display:none;">
- <div id="player">
+  <div id="player" style="display:none;">
         <div id="player-content1">
             <div class="music-name"></div>
             <div class="artist-name"></div>
@@ -822,10 +822,13 @@
     <div id="level-finish-text"></div>
     <button id="next-btn">下一关</button>
     <button id="retry-btn" style="margin-left:10px;">重玩</button>
+    <button id="gobang-btn" style="margin-left:10px; display:none;">五子棋对弈</button>
+    <button id="close-game-btn-level" style="margin-left:10px;">关闭游戏</button> </div>
   </div>
   <div id="game-over" style="display:none;">
     <div id="game-over-text"></div>
     <button id="retry-btn2">重试</button>
+    <button id="close-game-btn-gameover" style="margin-left:10px;">关闭游戏</button> </div>
   </div>
   <div id="footer">
       喵了个咪 &copy; 2025 | Designed by 开元
@@ -869,7 +872,8 @@ const REDEMPTION_CODES = {
   "兑换码": { undo: 5, hint: 5, shuffle: 5 },
   "princess": { undo: 50, hint: 50, shuffle: 50 },
   "不知道": { undo: 3, hint: 1, shuffle: 1 },
-  "开元": { undo: 10, hint: 10, shuffle: 10 }
+  "开元": { undo: 10, hint: 10, shuffle: 10 },
+  "通关": { type: "skip_level" } // Added "通关" redemption code
 };
 // MODIFICATION END
 
@@ -1204,7 +1208,7 @@ function checkWin(){
       if(game.level===1){
         showLevelFinish('恭喜！第一关通关！');
       }else{
-        showLevelFinish('🎉 恭喜您！所有关卡全部通关！你太棒啦！🎉');
+        showLevelFinish('所有关卡全部通关！<br> 🎉 你太棒啦！🎉');
       }
     },330);
   }
@@ -1332,13 +1336,7 @@ function startGame(level){
   game.lock = false;
   renderAll();
   updateToolButtons();
-  if (level === 2) {
-    game.bgmOn = false;
-    document.getElementById('music-toggle').innerHTML = '🔇';
-    playBgm(false);
-  } else {
-    playBgm(game.bgmOn);
-  }
+  playBgm(game.bgmOn);
 }
 
 function renderBoard(){
@@ -1445,14 +1443,26 @@ document.getElementById('code-btn').onclick=function(){
 
   if (REDEMPTION_CODES[val]) {
     const rewards = REDEMPTION_CODES[val];
-    game.toolUses.undo += rewards.undo;
-    game.toolUses.hint += rewards.hint;
-    game.toolUses.shuffle += rewards.shuffle;
 
-    // Optional: Add a check to prevent reusing codes
-    // delete REDEMPTION_CODES[val];
+    // New logic for "skip_level" code
+    if (rewards.type === "skip_level") {
+      // Simulate winning the current level
+      game.board.forEach(card => card.matched = true); // Mark all cards as matched
+      renderBoard(); // Update the board display
+      renderProgress(); // Update the progress display
+      checkWin(); // Check for win condition
+      showMessage(`兑换成功！当前关卡已跳过！`, "#3e5a2b"); // Success message
+    } else {
+      // Existing logic for tool redemption
+      game.toolUses.undo += rewards.undo;
+      game.toolUses.hint += rewards.hint;
+      game.toolUses.shuffle += rewards.shuffle;
 
-    showMessage(`兑换成功！获得撤销x${rewards.undo}, 提示x${rewards.hint}, 洗牌x${rewards.shuffle}`, "#3e5a2b");
+      // Optional: Add a check to prevent reusing codes
+      // delete REDEMPTION_CODES[val];
+
+      showMessage(`兑换成功！获得撤销x${rewards.undo}, 提示x${rewards.hint}, 洗牌x${rewards.shuffle}`, "#3e5a2b");
+    }
     updateToolButtons();
   } else {
     showMessage('兑换码错误', "#c0392b");
@@ -1486,6 +1496,27 @@ function showLevelFinish(msg){
   document.getElementById('level-finish').style.display='flex';
   document.getElementById('level-finish-text').innerHTML=msg;
   document.getElementById('next-btn').style.display = (game.level===1)?'inline-block':'none';
+ 
+  // Control visibility of the music player and Gobang button based on the current level
+  const playerDiv = document.getElementById('player');
+  const gobangBtn = document.getElementById('gobang-btn'); // Assuming you've already added this button in HTML
+
+  if (game.level === 2) {
+    playerDiv.style.display = 'block'; // Or 'flex', 'inline-block' based on your layout needs
+    if (gobangBtn) { // Check if the button exists before trying to set style
+      gobangBtn.style.display = 'inline-block'; // Or 'block'
+    }
+  } else {
+    playerDiv.style.display = 'none';
+    if (gobangBtn) {
+      gobangBtn.style.display = 'none';
+    }
+  }
+  // MODIFICATION START: Add a hint for Level 1 completion
+  if (game.level === 1) {
+    document.getElementById('level-finish-text').innerHTML += '<br><br>第二关通关有彩蛋🪅';
+  }
+  // MODIFICATION END
   playBgm(false);
 }
 document.getElementById('next-btn').onclick = function(){
@@ -1496,16 +1527,47 @@ document.getElementById('next-btn').onclick = function(){
 
     document.getElementById('retry-btn').onclick = function(){
       document.getElementById('level-finish').style.display='none';
-      startGame(game.level);
+      startGame(1);
       playBgm(game.bgmOn);
     };
-
+    document.getElementById('gobang-btn').onclick = function() {
+      window.open('https://kaiyuanzhuadmin.github.io/kaiyuan/', '_blank');
+    };
 // Modified this function to be callable later
 function initializeGame(){
   document.getElementById('music-toggle').innerHTML = game.bgmOn?'🎼':'🔇';
   updateToolButtons();
   footer.style.display = 'none';
 }
+// For Level Finish screen
+document.getElementById('close-game-btn-level').onclick = function() {
+    showConfirm('确定要关闭游戏吗？', () => {
+        // Attempt to close the window. This will likely only work if the window
+        // was opened by a script (e.g., via window.open() from your domain).
+        // Otherwise, browsers will often prevent it for security reasons.
+        window.close();
+
+        // Fallback or message if window.close() fails
+        setTimeout(() => {
+            document.getElementById('game-container').style.display = 'none';
+            document.body.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-size:2em; color:#5d4037; text-align:center;">感谢游玩！无法自动关闭页面，请手动关闭。<br><br><small style="font-size:0.5em;">喵了个咪 &copy; 2025 | Designed by 开元</small></div>';
+        }, 100); // Give a small delay to allow window.close() to attempt
+    });
+};
+
+// For Game Over screen
+document.getElementById('close-game-btn-gameover').onclick = function() {
+    showConfirm('确定要关闭游戏吗？', () => {
+        // Attempt to close the window. Same caveats as above apply.
+        window.close();
+
+        // Fallback or message if window.close() fails
+        setTimeout(() => {
+            document.getElementById('game-container').style.display = 'none';
+            document.body.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-size:2em; color:#5d4037; text-align:center;">感谢游玩！无法自动关闭页面，请手动关闭。<br><br><small style="font-size:0.5em;">喵了个咪 &copy; 2025 | Designed by 开元</small></div>';
+        }, 100); // Give a small delay to allow window.close() to attempt
+    });
+};
 </script>
 
 <script>
@@ -1534,7 +1596,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadingScreen.style.opacity = '0';
                 loadingScreen.addEventListener('transitionend', () => {
                     loadingScreen.style.display = 'none';
-                    // 关键修改：在加载完成后将标题修改为"喵了个咪"
                     document.title = "喵了个咪";
                     initializeGame();
                 }, { once: true });
