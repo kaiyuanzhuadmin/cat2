@@ -35,22 +35,26 @@
       75% { transform: translateY(5px) rotate(-1deg); }
     }
     @keyframes show-card-property {
-  0% { opacity: 0; }
-  20% { opacity: 1; }
-  80% { opacity: 1; }
-  100% { opacity: 0; }
-}
+      0% { opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    @keyframes fade-in-out-scale {
+      0% { opacity: 0; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.1); }
+      100% { opacity: 0; transform: scale(0.9); }
+    }
  #start-screen {
       position: absolute;
       left: 0; right: 0; top: 0; bottom: 0;
       z-index: 88;
       display: flex;
-      /* MODIFIED: Changed vertical alignment */
       align-items: center;
       justify-content: flex-start;
       padding-top: 6vh;
       flex-direction: column;
-      font-size: 1.3rem;
+      font-size: 3.3rem;
       border-radius: 25px;
       text-align: center;
       overflow: hidden; /* 确保背景图不会超出容器 */
@@ -64,7 +68,7 @@
       background-image: url('mao.webp'); /* 使用与body相同的背景图 */
       background-size: cover;
       background-position: center;
-      opacity: 0.2; /* 设置透明度20% */
+      opacity: 0.3; /* 设置透明度30% */
       z-index: -1; /* 确保背景在内容后面 */
     }
     body {
@@ -105,7 +109,7 @@
       border-top-right-radius: 22px;
     }
     #progress-info {
-      font-size: 1.15rem;
+      font-size: 1.55rem;
       font-weight: bold;
       color: #5d4037;
       text-shadow: 0.5px 0.5px 0 rgba(255,255,255,0.7);
@@ -387,22 +391,20 @@
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       border-radius: 25px;
       text-align: center;
     }
     #start-screen h1 {
-      font-size: 3.2rem;
+      font-size: 4.8rem;
       margin: 0 0 25px 0;
-      color: #8B4513;
-      font-family: 'HanyiSentyLotus', 'Comic Sans MS', cursive;
       letter-spacing: 3px;
       text-shadow: 2px 2px 0 #f7e9d7, 4px 4px 0 #b8860b;
       display: inline-block;
     }
     #start-screen h1 span {
       display: inline-block;
-      animation: wave 1.5s infinite ease-in-out;
+      animation: wave 2s infinite ease-in-out;
 }
 #start-screen h1 span:nth-child(1) { animation-delay: -0.4s; }
 #start-screen h1 span:nth-child(2) { animation-delay: -0.2s; }
@@ -468,7 +470,7 @@
       background-image: url('mao1.webp'); /* 使用与开始界面相同的背景图 */
       background-size: cover;
       background-position: center;
-      opacity: 0.2; /* 透明度20% */
+      opacity: 0.3; /* 透明度30% */
       z-index: -1; /* 确保背景在内容下方 */
 }
     #level-finish button, #game-over button {
@@ -604,6 +606,13 @@
         background: #e9d9c6;
     }
     /* --- End Modal Styles --- */
+   #level-finish-text {
+      font-family: 'Microsoft Yahei','Segoe UI', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+      color: #3e2723;
+      font-size: 1.2em; /* 可以根据需要调整字体大小 */
+      text-align: center;
+      margin-bottom: 20px;
+      }
     /* --- Loading Screen Styles --- */
     #loading-screen {
       position: fixed;
@@ -621,7 +630,7 @@
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
       background-color: #f7f0e8; /* Game's main background color */
-      opacity: 0.9;
+      opacity: 0.8;
       z-index: 1;
     }
     .loading-content {
@@ -640,10 +649,10 @@
       box-sizing: border-box;
     }
     .loading-title {
-  font-size: 3.2rem;
+  font-size: 2.8rem;
   margin: 0 0 40px 0;
-  color: #8B4513;
-  font-family: 'HanyiSentyLotus', 'Comic Sans MS', cursive;
+  font-family: 'FangSong', 'Segoe UI', 'PingFang SC', 'Helvetica Neue', Arial, 'Microsoft Yahei', sans-serif;
+  color: #3e2723;
   letter-spacing: 3px;
   text-shadow: 2px 2px 0 #f7e9d7, 4px 4px 0 #b8860b;
   animation: pulse-scale 1.5s infinite ease-in-out;
@@ -1206,7 +1215,7 @@ function checkWin(){
   if(game.board.every(c=>c.matched)){
     setTimeout(()=>{
       if(game.level===1){
-        showLevelFinish('恭喜！第一关通关！');
+        showLevelFinish('恭喜恭喜！第一关通关！');
       }else{
         showLevelFinish('所有关卡全部通关！<br> 🎉 你太棒啦！🎉');
       }
@@ -1494,17 +1503,30 @@ document.getElementById('retry-btn2').onclick = function(){
 };
 function showLevelFinish(msg){
   document.getElementById('level-finish').style.display='flex';
-  document.getElementById('level-finish-text').innerHTML=msg;
+  const levelFinishTextElement = document.getElementById('level-finish-text'); // 获取元素引用
+  levelFinishTextElement.innerHTML=msg; // 使用引用
+
+  // 根据关卡设置不同的动画效果
+  if (game.level === 1) {
+    levelFinishTextElement.style.animation = 'fade-in-out-scale 3s infinite alternate, show-card-property 4s forwards';
+    levelFinishTextElement.innerHTML += '<br>第二关后会有彩蛋🪅！'; // 保持第一关的彩蛋提示
+  } else if (game.level === 2) {
+    levelFinishTextElement.style.animation = 'pulse-scale 2s infinite alternate, wave 2s infinite'; // 第二关使用新的动画
+  } else {
+    // 默认情况或为其他关卡设置无动画或特定动画
+    levelFinishTextElement.style.animation = ''; // 清除动画
+  }
+
   document.getElementById('next-btn').style.display = (game.level===1)?'inline-block':'none';
- 
-  // Control visibility of the music player and Gobang button based on the current level
+
+  // 控制音乐播放器和五子棋按钮的可见性（保留原有逻辑）
   const playerDiv = document.getElementById('player');
-  const gobangBtn = document.getElementById('gobang-btn'); // Assuming you've already added this button in HTML
+  const gobangBtn = document.getElementById('gobang-btn');
 
   if (game.level === 2) {
-    playerDiv.style.display = 'block'; // Or 'flex', 'inline-block' based on your layout needs
-    if (gobangBtn) { // Check if the button exists before trying to set style
-      gobangBtn.style.display = 'inline-block'; // Or 'block'
+    playerDiv.style.display = 'block';
+    if (gobangBtn) {
+      gobangBtn.style.display = 'inline-block';
     }
   } else {
     playerDiv.style.display = 'none';
@@ -1512,13 +1534,10 @@ function showLevelFinish(msg){
       gobangBtn.style.display = 'none';
     }
   }
-  // MODIFICATION START: Add a hint for Level 1 completion
-  if (game.level === 1) {
-    document.getElementById('level-finish-text').innerHTML += '<br><br>第二关通关有彩蛋🪅';
-  }
-  // MODIFICATION END
+
   playBgm(false);
 }
+
 document.getElementById('next-btn').onclick = function(){
       document.getElementById('level-finish').style.display='none';
       startGame(2);
