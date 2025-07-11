@@ -42,7 +42,7 @@
     }
     @keyframes fade-in-out-scale {
       0% { opacity: 0; transform: scale(0.8); }
-      50% { opacity: 1; transform: scale(1.1); }
+      50% { opacity: 1; transform: scale(1); }
       100% { opacity: 0; transform: scale(0.9); }
     }
  #start-screen {
@@ -621,7 +621,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: url('mao3.webp') no-repeat center center;
+      background-color: #f7f0e8; /* Game's main background color */
       background-size: cover;
       transition: opacity 0.5s ease-out;
     }
@@ -629,8 +629,9 @@
       content: '';
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      background-color: #f7f0e8; /* Game's main background color */
-      opacity: 0.8;
+      background: #f7f0e8 url('mao3.webp') no-repeat center center fixed;
+      background-size: cover;
+      opacity: 0.5;
       z-index: 1;
     }
     .loading-content {
@@ -1569,7 +1570,7 @@ document.getElementById('close-game-btn-level').onclick = function() {
         // Fallback or message if window.close() fails
         setTimeout(() => {
             document.getElementById('game-container').style.display = 'none';
-            document.body.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-size:2em; color:#5d4037; text-align:center;">感谢游玩！无法自动关闭页面，请手动关闭。<br><br><small style="font-size:0.5em;">喵了个咪 &copy; 2025 | Designed by 开元</small></div>';
+            document.body.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-size:2em; color:#5d4037; text-align:center;opacity: 0.5;">感谢游玩！无法自动关闭页面，请手动关闭。<br><br><small style="font-size:0.5em;">喵了个咪 &copy; 2025 | Designed by 开元</small></div>';
         }, 100); // Give a small delay to allow window.close() to attempt
     });
 };
