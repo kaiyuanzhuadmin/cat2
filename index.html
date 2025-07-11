@@ -530,7 +530,7 @@ body::after {
       background-image: url('mao1.webp'); /* 使用与开始界面相同的背景图 */
       background-size: cover;
       background-position: center;
-      opacity: 0.3; /* 透明度30% */
+      opacity: 0.4; /* 透明度40% */
       z-index: -1; /* 确保背景在内容下方 */
 }
     #level-finish button, #game-over button {
@@ -696,7 +696,7 @@ body::after {
       top: 0; left: 0; width: 100%; height: 100%;
       background: #f7f0e8 url('mao3.webp') no-repeat center center fixed;
       background-size: cover;
-      opacity: 0.5;
+      opacity: 0.6;/*不透明度60%
       z-index: 1;
     }
     .loading-content {
@@ -1633,7 +1633,7 @@ function showLevelFinish(msg){
 
   // 根据关卡设置不同的动画效果
   if (game.level === 1) {
-    levelFinishTextElement.style.animation = 'shake 3s infinite show-card-property 8s forwards';
+    levelFinishTextElement.style.animation = 'shake 3s infinite, show-card-property 8s forwards';
     levelFinishTextElement.innerHTML += '<br>第二关后会有彩蛋🪅！'; // 保持第一关的彩蛋提示
   } else if (game.level === 2) {
     levelFinishTextElement.style.animation = 'pulse-scale 2s infinite alternate, wave 2s infinite'; // 第二关使用新的动画
