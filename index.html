@@ -890,7 +890,7 @@ body::after {
 
 
 <audio id="bgm" src="Get.mp3" loop preload="auto"></audio>
-<audio id="click-sound" src="bullt.mp3" preload="auto"></audio>
+<audio id="click-sound" src="ka.mp3" preload="auto"></audio>
  <script src="js/jquery-3.4.1.min.js"></script>
     <script src="js/index.js"></script>
 <script>
@@ -921,7 +921,6 @@ const REDEMPTION_CODES = {
 // MODIFICATION END
 
 const bgm = document.getElementById('bgm');
-const clickSound = document.getElementById('click-sound');
 const confirmModal = document.getElementById('confirm-modal');
 const confirmMsg = document.getElementById('confirm-msg');
 const confirmYes = document.getElementById('confirm-yes');
@@ -974,15 +973,38 @@ function playBgm(on) {
     bgm.pause();
   }
 }
+let clickSoundPool = [];
+const MAX_CLICK_SOUNDS = 5; // 定义最多同时播放的点击音效数量
 
-function playClickSound() {
-  if (game.bgmOn && clickSound) {
-    clickSound.volume = 0.2;
-    clickSound.currentTime = 0;
-    clickSound.play().catch(e => console.error("Click sound failed:", e));
-  }
+function createClickSoundInstance() {
+    const audio = new Audio('ka.mp3'); // 使用 Audio 构造函数创建新实例
+    audio.preload = 'auto';
+    audio.volume = 0.5; // 默认音量
+    return audio;
 }
 
+// 提前创建一些音频实例放入池中
+for (let i = 0; i < MAX_CLICK_SOUNDS; i++) {
+    clickSoundPool.push(createClickSoundInstance());
+}
+
+function playClickSound() {
+  if (game.bgmOn) {
+    // 从池中获取一个可用的音频实例
+    let soundInstance = clickSoundPool.find(audio => audio.paused || audio.ended);
+
+    if (!soundInstance) {
+        // 如果池中没有可用的，就创建一个新的（这可能会导致短时间内的额外内存使用，但确保了声音播放）
+        soundInstance = createClickSoundInstance();
+        // 可选：如果希望限制实例数量，可以替换掉池中最老的实例，或者不添加到池中
+        // clickSoundPool.shift();
+        // clickSoundPool.push(soundInstance);
+    }
+
+    soundInstance.currentTime = 0; // 确保每次都从头开始播放
+    soundInstance.play().catch(e => console.error("Click sound failed:", e));
+  }
+}
 function showConfirm(msg, callback) {
   confirmMsg.textContent = msg;
   confirmCallback = callback;
@@ -1613,6 +1635,16 @@ function initializeGame(){
   document.getElementById('music-toggle').innerHTML = game.bgmOn?'🎼':'🔇';
   updateToolButtons();
   footer.style.display = 'none';
+// 设置背景音乐的音量
+    if (bgm) {
+        bgm.volume = 0.3; // 将音量设置为 0.5 (50%)。你可以根据需要调整这个值。
+                          // 0.0 是静音，1.0 是最大音量。
+    }
+
+    // 播放背景音乐
+    if (bgm && game.bgmOn) { // 确保 bgmOn 是一个控制背景音乐播放的变量
+        bgm.play().catch(e => console.error("BGM playback failed:", e));
+    }
 }
 // For Level Finish screen
 document.getElementById('close-game-btn-level').onclick = function() {
