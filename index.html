@@ -974,12 +974,12 @@ function playBgm(on) {
   }
 }
 let clickSoundPool = [];
-const MAX_CLICK_SOUNDS = 5; // 定义最多同时播放的点击音效数量
+const MAX_CLICK_SOUNDS = 10; // 定义最多同时播放的点击音效数量
 
 function createClickSoundInstance() {
     const audio = new Audio('ka.mp3'); // 使用 Audio 构造函数创建新实例
     audio.preload = 'auto';
-    audio.volume = 0.5; // 默认音量
+    audio.volume = 0.4; // 默认音量
     return audio;
 }
 
