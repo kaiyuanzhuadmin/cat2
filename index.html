@@ -340,7 +340,7 @@ body::after {
       justify-content: center;
       font-size: 2.6rem;
       user-select: none;
-      z-index: 1000; /* Ensured it's on top */
+      z-index: 10000; /* Ensured it's on top */
       transition: top 0.3s ease-in-out, left 0.3s ease-in-out, transform 0.3s ease-in-out;
       overflow: hidden;
       color: #5d4037;
@@ -857,7 +857,7 @@ body::after {
       <div class="temp-slot"></div>
       <div class="temp-slot"></div>
       <div class="temp-slot"></div>
-    </div>
+      </div>
     <div id="tools-bar">
       <button id="undo-btn" disabled title="撤销(需兑换码)">↩️ 撤销 (<span id="undo-count">0</span>)</button>
       <button id="hint-btn" disabled title="提示(需兑换码)">💡 提示 (<span id="hint-count">0</span>)</button>
@@ -870,10 +870,12 @@ body::after {
     </div>
     <div id="message-bar"></div>
   </div>
+    <div id="footer">
+      喵了个咪 &copy; 2025 | Designed by 开元
+     </div>
   <div id="start-screen">
      <h1><span>喵</span><span>了</span><span>个</span><span>咪</span><span> 🐾</span></h1>
-  <!-- 其他内容保持不变 -->
-    <p>
+  <p>
       <p>
       <button class="start-btn" id="start-btn">开始游戏</button>
       </p>
@@ -882,6 +884,9 @@ body::after {
     <small>喵了个咪 &copy; 2025 | Designed by 开元</small>
   </div>
   <div id="level-finish" style="display:none;">
+  <div id="netease-player" style="display:none;">
+    <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="210" src="//music.163.com/outchain/player?type=0&id=2840182853&auto=1&height=430"></iframe>
+  </div>
   <div id="player" style="display:none;">
         <div id="player-content1">
             <div class="music-name"></div>
@@ -921,11 +926,8 @@ body::after {
     <button id="retry-btn2">重试</button>
     <button id="close-game-btn-gameover" style="margin-left:10px;">关闭游戏</button> </div>
   </div>
-  <div id="footer">
-      喵了个咪 &copy; 2025 | Designed by 开元
-  </div>
+  
 </div>
-
 <div id="confirm-modal" class="modal-overlay">
   <div class="modal-content">
     <p id="confirm-msg">你确定吗？</p>
@@ -1645,26 +1647,26 @@ document.getElementById('retry-btn2').onclick = function(){
 function showLevelFinish(msg){
   document.getElementById('level-finish').style.display='flex';
   const levelFinishTextElement = document.getElementById('level-finish-text'); // 获取元素引用
+  const neteasePlayerDiv = document.getElementById('netease-player');
+  const playerDiv = document.getElementById('player');
+  const gobangBtn = document.getElementById('gobang-btn');
   levelFinishTextElement.innerHTML=msg; // 使用引用
 
   // 根据关卡设置不同的动画效果
   if (game.level === 1) {
-    levelFinishTextElement.style.animation = 'shake 3s infinite, show-card-property 8s forwards';
-    levelFinishTextElement.innerHTML += '<br>第二关后会有彩蛋🪅！'; // 保持第一关的彩蛋提示
+    levelFinishTextElement.style.animation = 'shake 3s infinite, show-card-property 6s forwards';
+    levelFinishTextElement.innerHTML += '<br>下一关后有彩蛋🪅！'; // 保持第一关的彩蛋提示
+    neteasePlayerDiv.style.display = 'block'; // Show NetEase player for Level 1
   } else if (game.level === 2) {
-    levelFinishTextElement.style.animation = 'pulse-scale 2s infinite alternate, wave 2s infinite'; // 第二关使用新的动画
+    neteasePlayerDiv.style.display = 'none';
   } else {
     // 默认情况或为其他关卡设置无动画或特定动画
     levelFinishTextElement.style.animation = ''; // 清除动画
   }
-
   document.getElementById('next-btn').style.display = (game.level===1)?'inline-block':'none';
 
-  // 控制音乐播放器和五子棋按钮的可见性（保留原有逻辑）
-  const playerDiv = document.getElementById('player');
-  const gobangBtn = document.getElementById('gobang-btn');
-
   if (game.level === 2) {
+     levelFinishTextElement.style.animation = 'pulse-scale 2s infinite alternate, wave 2s infinite'; // 第二关使用新的动画
     playerDiv.style.display = 'block';
     if (gobangBtn) {
       gobangBtn.style.display = 'inline-block';
@@ -1697,7 +1699,7 @@ document.getElementById('next-btn').onclick = function(){
 function initializeGame(){
   document.getElementById('music-toggle').innerHTML = game.bgmOn?'🎼':'🔇';
   updateToolButtons();
-  footer.style.display = 'none';
+  // footer.style.display = 'none'; // This line can now be removed if footer is always visible within game-container
 // 设置背景音乐的音量
     if (bgm) {
         bgm.volume = 0.3; // 将音量设置为 0.5 (50%)。你可以根据需要调整这个值。
@@ -1734,7 +1736,7 @@ document.getElementById('close-game-btn-gameover').onclick = function() {
         // Fallback or message if window.close() fails
         setTimeout(() => {
             document.getElementById('game-container').style.display = 'none';
-            document.body.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-size:2em; color:#5d4037; text-align:center;">感谢游玩！无法自动关闭页面，请手动关闭。<br><br><small style="font-size:0.5em;">喵了个咪 &copy; 2025 | Designed by 开元</small></div>';
+            document.body.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-size:2em; color:#5d4037; text-align:center;">感谢游玩！无法自动关闭页面，请手动关闭。<br><p><br><small style="font-size:0.5em;">喵了个咪 &copy; 2025 | Designed by 开元</small></div>';
         }, 100); // Give a small delay to allow window.close() to attempt
     });
 };
