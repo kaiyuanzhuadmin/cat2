@@ -814,6 +814,9 @@ body::after {
         width: 50%;
       }
     }
+    body.no-scroll {
+  overflow: hidden;
+}
  </style>
  <link rel="stylesheet" href="font/iconfont.css">
     <link rel="stylesheet" href="css/style.css">
@@ -1735,6 +1738,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBar = document.getElementById('progress-bar');
     const loadingText = document.getElementById('loading-text');
 
+    // Add no-scroll class to body when loading screen appears
+    document.body.classList.add('no-scroll');
+
     let progress = 0;
     const assets = ["加载字体...", "加载音效...", "加载图片...", "初始化关卡...", "准备喵咪...", "完成!"];
     let assetIndex = 0;
@@ -1742,11 +1748,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const interval = setInterval(() => {
         progress += Math.random() * 15 + 5;
-        
+
         if (progress >= 100) {
             progress = 100;
             clearInterval(interval);
-            
+
             progressBar.style.width = progress + '%';
             loadingText.textContent = assets[assets.length - 1];
 
@@ -1754,6 +1760,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadingScreen.style.opacity = '0';
                 loadingScreen.addEventListener('transitionend', () => {
                     loadingScreen.style.display = 'none';
+                    // Remove no-scroll class from body when loading screen fades out
+                    document.body.classList.remove('no-scroll');
                     document.title = "喵了个咪";
                     initializeGame();
                 }, { once: true });
@@ -1768,6 +1776,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 250);
 });
+
 </script>
 </body>
 </html>
