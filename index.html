@@ -940,6 +940,7 @@ body::after {
     <button id="next-btn">下一关</button>
     <button id="retry-btn" style="margin-left:10px;">重玩</button>
     <button id="gobang-btn" style="margin-left:10px; display:none;">五子棋对弈</button>
+    <button id="restart-game-btn" style="margin-left:10px; display:none;">重开游戏</button>
     <button id="close-game-btn-level" style="margin-left:10px;">关闭游戏</button> </div>
   </div>
   <div id="game-over" style="display:none;">
@@ -984,7 +985,7 @@ const TEMP_LIMIT = 7;
 const REDEMPTION_CODES = {
   "kaiyuan": { undo: 20, hint: 20, shuffle: 20 },
   "兑换码": { undo: 5, hint: 5, shuffle: 5 },
-  "princess": { undo: 50, hint: 50, shuffle: 50 },
+  "喵了个咪": { undo: 50, hint: 50, shuffle: 50 },
   "不知道": { undo: 3, hint: 1, shuffle: 1 },
   "开元": { undo: 10, hint: 10, shuffle: 10 },
   "通关": { type: "skip_level" } // Added "通关" redemption code
@@ -1671,6 +1672,7 @@ function showLevelFinish(msg){
   const neteasePlayerDiv = document.getElementById('netease-player');
   const playerDiv = document.getElementById('player');
   const gobangBtn = document.getElementById('gobang-btn');
+  const restartgameBtn = document.getElementById('restart-game-btn');
   const retryBtn = document.getElementById('retry-btn');
   levelFinishTextElement.innerHTML = msg;
 
@@ -1685,6 +1687,7 @@ function showLevelFinish(msg){
     playerDiv.style.display = 'block';
     neteasePlayerDiv.style.display = 'none';
     gobangBtn.style.display = 'none';
+    restartgameBtn.style.display = 'none';
     retryBtn.style.display = 'inline-block';
     
   } else if (game.level === 2) {
@@ -1695,6 +1698,7 @@ function showLevelFinish(msg){
     playerDiv.style.display = 'none';
     neteasePlayerDiv.style.display = 'block';
     gobangBtn.style.display = 'inline-block';
+    restartgameBtn.style.display = 'inline-block';
     retryBtn.style.display = 'none';
   }
 
@@ -1714,11 +1718,13 @@ document.getElementById('next-btn').onclick = function(){
     document.getElementById('gobang-btn').onclick = function() {
       window.open('https://kaiyuanzhuadmin.github.io/kaiyuan/', '_blank');
     };
-// Modified this function to be callable later
+    document.getElementById('restart-game-btn').onclick = function() {
+            window.location.href = 'https://kaiyuanzhuadmin.github.io/cat/'; // 跳转到新页面
+    };
+
 function initializeGame(){
   document.getElementById('music-toggle').innerHTML = game.bgmOn?'🎼':'🔇';
   updateToolButtons();
-  // footer.style.display = 'none'; // This line can now be removed if footer is always visible within game-container
 // 设置背景音乐的音量
     if (bgm) {
         bgm.volume = 0.3; // 将音量设置为 0.5 (50%)。你可以根据需要调整这个值。
@@ -1730,6 +1736,72 @@ function initializeGame(){
         bgm.play().catch(e => console.error("BGM playback failed:", e));
     }
 }
+document.addEventListener('DOMContentLoaded', function() {
+    const codeInput = document.getElementById('code-input');
+    const codeBtn = document.getElementById('code-btn');
+    const feedbackDiv = document.createElement('div');
+    feedbackDiv.style.color = 'red';
+    feedbackDiv.style.fontSize = '12px';
+    feedbackDiv.style.marginTop = '5px';
+    codeInput.parentNode.insertBefore(feedbackDiv, codeInput.nextSibling);
+    // 监听输入事件
+    codeInput.addEventListener('input', function() {
+        const code = codeInput.value;
+        // 清除之前的验证信息
+        feedbackDiv.textContent = '';
+        codeInput.style.borderColor = '';
+        // 修改正则表达式以支持汉字、大小写字母和数字
+        // \u4e00-\u9fa5 表示汉字的Unicode范围
+        const codeRegex = /^[\u4e00-\u9fa5a-zA-Z0-9]*$/;      
+        if (code.length === 7) {
+            // 兑换码长度为7，进行格式验证
+            const isValidFormat = codeRegex.test(code);
+            if (isValidFormat) {
+                // 格式正确
+                feedbackDiv.textContent = '字符数正确';
+                feedbackDiv.style.color = 'green';
+                codeInput.style.borderColor = 'green';
+// 自动触发兑换按钮的点击事件
+                codeBtn.disabled = false; // 启用兑换按钮
+                codeBtn.click(); 
+            } else {
+                // 格式不正确
+                feedbackDiv.textContent = '兑换码包含不支持的字符';
+                feedbackDiv.style.color = 'red';
+                codeInput.style.borderColor = 'red';
+                //codeBtn.disabled = true; // 禁用兑换按钮
+            }
+        } else if (code.length < 7) {
+            feedbackDiv.textContent = `还可输入 ${7 - code.length} 位`;
+            feedbackDiv.style.color = 'orange';
+            codeInput.style.borderColor = 'orange';
+            //codeBtn.disabled = true; // 禁用兑换按钮
+        } else {
+            // 输入框为空
+            codeBtn.disabled = true; // 禁用兑换按钮
+        }
+    });
+
+    // 初始禁用按钮
+    codeBtn.addEventListener('click', function() {
+       // 清空输入框
+        codeInput.value = '';
+        // 重置状态
+        feedbackDiv.textContent = '';
+        codeInput.style.borderColor = '';
+    });
+codeBtn.disabled = true;
+});
+
+document.getElementById('code-input').addEventListener('keyup', function(event) {
+  // 检查是否是回车键 (keyCode 13 或 key 'Enter')
+  if (event.keyCode === 13 || event.key === 'Enter') {
+    // 阻止默认的回车行为（例如提交表单）
+    event.preventDefault();
+    // 触发兑换按钮的点击事件
+    document.getElementById('code-btn').click();
+  }
+});
 // For Level Finish screen
 document.getElementById('close-game-btn-level').onclick = function() {
     showConfirm('确定要关闭游戏吗？', () => {
@@ -1745,15 +1817,17 @@ document.getElementById('close-game-btn-level').onclick = function() {
   
   // 设置感谢页面内容
   document.body.innerHTML = `
-    <div class="game-thankyou-screen" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-size:2em; color:#5d4037; text-align:center;opacity: 1;">
-      感谢游玩！受客户端限制，请手动关闭。
-      <br> 如果想重新开始游戏，请点击<br> 
-      <a href="https://kaiyuanzhuadmin.github.io/cat/" class="text-red-600 hover:text-red-800 font-medium transition-colors duration-300 flex items-center justify-center mt-4">
+    <div class="game-thankyou-screen" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:60vh; font-size:1.5em; color:#5d4037; text-align:center;opacity: 1;">
+      <p>当前客户端暂不支持自动关闭，</p><p>请点击页面关闭标签关闭。</p>
+      <br> 如若重新开始游戏，请点击<br><br>
+      <button onclick="window.location.href='https://kaiyuanzhuadmin.github.io/cat/'"
+              class="text-red-600 hover:text-red-800 font-medium transition-colors duration-300 flex items-center justify-center mt-4"
+              style="padding: 10px 20px; border: 1px solid #dc2626; background-color: #fef2f2; cursor: pointer; border-radius: 0.375rem; /* For rounded corners */">
         <span class="ml-1 flex items-center">重新开始<i class="fa fa-refresh ml-1"></i></span>
-      </a>
+      </button>
       <br>
       <small class="loading-footer mt-8">喵了个咪 &copy; 2025 | Designed by 开元</small>
-    </div>
+</div>
   `;
   
   // 动态加载Font Awesome CSS
@@ -1775,15 +1849,17 @@ document.getElementById('close-game-btn-gameover').onclick = function() {
         setTimeout(() => {
             document.getElementById('game-container').style.display = 'none';
              document.body.innerHTML = `
-    <div class="game-thankyou-screen" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-size:2em; color:#5d4037; text-align:center;opacity: 1;">
-      失败乃成功之母，可输入“兑换码”兑换提示次数。
-      <br> 如果想重新开始游戏，请点击<br> 
-      <a href="https://kaiyuanzhuadmin.github.io/cat/" class="text-red-600 hover:text-red-800 font-medium transition-colors duration-300 flex items-center justify-center mt-4">
+<div class="game-thankyou-screen" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:60vh; font-size:1.5em; color:#5d4037; text-align:center;opacity: 1;">
+      <p>当前客户端暂不支持自动关闭</p><p>小提示：可输入“kaiyuan”兑换提示次数。</p>
+      <br> 如果想重新开始游戏，请点击<br><br>
+      <button onclick="window.location.href='https://kaiyuanzhuadmin.github.io/cat/'"
+              class="text-red-600 hover:text-red-800 font-medium transition-colors duration-300 flex items-center justify-center mt-4"
+              style="padding: 10px 20px; border: 1px solid #dc2626; background-color: #fef2f2; cursor: pointer; border-radius: 0.375rem; /* For rounded corners */">
         <span class="ml-1 flex items-center">重新开始<i class="fa fa-refresh ml-1"></i></span>
-      </a>
+      </button>
       <br>
       <small class="loading-footer mt-8">喵了个咪 &copy; 2025 | Designed by 开元</small>
-    </div>
+</div>
   `;
         }, 100); // Give a small delay to allow window.close() to attempt
     });
