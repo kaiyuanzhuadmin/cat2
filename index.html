@@ -1741,7 +1741,9 @@ document.getElementById('close-game-btn-level').onclick = function() {
         // Fallback or message if window.close() fails
         setTimeout(() => {
             document.getElementById('game-container').style.display = 'none';
-            document.body.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-size:2em; color:#5d4037; text-align:center;opacity: 1;">感谢游玩！无法自动关闭页面，请手动关闭。<br><br><small class="loading-footer">喵了个咪 &copy; 2025 | Designed by 开元</small></div>';
+                       document.body.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-size:2em; color:#5d4037; text-align:center;opacity: 1;">
+      感谢游玩！受客户端限制，请手动关闭。<br> 如果想重新开始游戏，请点击<br><a href="https://kaiyuanzhuadmin.github.io/cat/" class="text-red-600 hover:text-red-800 font-medium transition-colors duration-300 flex items-center">
+       <span class="ml-1 flex items-center">重新开始<i class="fa fa-refresh ml-1"></i></span></a><br><small class="loading-footer">喵了个咪 &copy; 2025 | Designed by 开元</small></div><link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">`;
         }, 100); // Give a small delay to allow window.close() to attempt
     });
 };
