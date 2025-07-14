@@ -1667,33 +1667,33 @@ document.getElementById('retry-btn2').onclick = function(){
 };
 function showLevelFinish(msg){
   document.getElementById('level-finish').style.display='flex';
-  const levelFinishTextElement = document.getElementById('level-finish-text'); // 获取元素引用
+  const levelFinishTextElement = document.getElementById('level-finish-text');
   const neteasePlayerDiv = document.getElementById('netease-player');
   const playerDiv = document.getElementById('player');
   const gobangBtn = document.getElementById('gobang-btn');
-  levelFinishTextElement.innerHTML=msg; // 使用引用
+  levelFinishTextElement.innerHTML = msg;
 
-  // 根据关卡设置不同的动画效果
+  document.getElementById('next-btn').style.display = (game.level === 1) ? 'inline-block' : 'none';
+
   if (game.level === 1) {
+    // --- Level 1 Finish Screen ---
     levelFinishTextElement.style.animation = 'shake 3s infinite, show-card-property 6s forwards';
-    levelFinishTextElement.innerHTML += '<br>下一关后有彩蛋🪅！'; // 保持第一关的彩蛋提示
-    neteasePlayerDiv.style.display = 'block'; // Show NetEase player for Level 1
-  } else if (game.level === 2) {
-    neteasePlayerDiv.style.display = 'none';
-  } else {
-    // 默认情况或为其他关卡设置无动画或特定动画
-    levelFinishTextElement.style.animation = ''; // 清除动画
-  }
-  document.getElementById('next-btn').style.display = (game.level===1)?'inline-block':'none';
+    levelFinishTextElement.innerHTML += '<br>下一关后有彩蛋🪅！';
 
-  if (game.level === 2) {
-     levelFinishTextElement.style.animation = 'pulse-scale 2s infinite alternate, wave 2s infinite'; // 第二关使用新的动画
+    // MODIFIED: Show the custom player and GoBang button on level 1
     playerDiv.style.display = 'block';
+    neteasePlayerDiv.style.display = 'none';
     if (gobangBtn) {
       gobangBtn.style.display = 'inline-block';
     }
-  } else {
+
+  } else if (game.level === 2) {
+    // --- Level 2 Finish Screen ---
+    levelFinishTextElement.style.animation = 'pulse-scale 2s infinite alternate, wave 2s infinite';
+
+    // MODIFIED: Show the NetEase player on level 2
     playerDiv.style.display = 'none';
+    neteasePlayerDiv.style.display = 'block';
     if (gobangBtn) {
       gobangBtn.style.display = 'none';
     }
@@ -1701,7 +1701,6 @@ function showLevelFinish(msg){
 
   playBgm(false);
 }
-
 document.getElementById('next-btn').onclick = function(){
       document.getElementById('level-finish').style.display='none';
       startGame(2);
