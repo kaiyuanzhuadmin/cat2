@@ -1671,6 +1671,7 @@ function showLevelFinish(msg){
   const neteasePlayerDiv = document.getElementById('netease-player');
   const playerDiv = document.getElementById('player');
   const gobangBtn = document.getElementById('gobang-btn');
+  const retryBtn = document.getElementById('retry-btn');
   levelFinishTextElement.innerHTML = msg;
 
   document.getElementById('next-btn').style.display = (game.level === 1) ? 'inline-block' : 'none';
@@ -1683,10 +1684,9 @@ function showLevelFinish(msg){
     // MODIFIED: Show the custom player and GoBang button on level 1
     playerDiv.style.display = 'block';
     neteasePlayerDiv.style.display = 'none';
-    if (gobangBtn) {
-      gobangBtn.style.display = 'none';
-    }
-
+    gobangBtn.style.display = 'none';
+    retryBtn.style.display = 'inline-block';
+    
   } else if (game.level === 2) {
     // --- Level 2 Finish Screen ---
     levelFinishTextElement.style.animation = 'pulse-scale 2s infinite alternate, wave 2s infinite';
@@ -1694,9 +1694,8 @@ function showLevelFinish(msg){
     // MODIFIED: Show the NetEase player on level 2
     playerDiv.style.display = 'none';
     neteasePlayerDiv.style.display = 'block';
-    if (gobangBtn) {
-      gobangBtn.style.display = 'inline-block';
-    }
+    gobangBtn.style.display = 'inline-block';
+    retryBtn.style.display = 'none';
   }
 
   playBgm(false);
