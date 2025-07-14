@@ -1741,7 +1741,7 @@ document.getElementById('close-game-btn-level').onclick = function() {
         // Fallback or message if window.close() fails
         setTimeout(() => {
             document.getElementById('game-container').style.display = 'none';
-            document.body.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-size:2em; color:#5d4037; text-align:center;opacity: 1;">感谢游玩！无法自动关闭页面，请手动关闭。<br><br><small style="font-size:0.5em;">喵了个咪 &copy; 2025 | Designed by 开元</small></div>';
+            document.body.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-size:2em; color:#5d4037; text-align:center;opacity: 1;">感谢游玩！无法自动关闭页面，请手动关闭。<br><br><small class="loading-footer">喵了个咪 &copy; 2025 | Designed by 开元</small></div>';
         }, 100); // Give a small delay to allow window.close() to attempt
     });
 };
