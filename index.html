@@ -115,7 +115,7 @@
       border-radius: 25px;
       box-shadow: 0 5px 25px rgba(100, 60, 40, 0.3);
       padding: 0 0 20px 0;
-      position: relative;
+      position: relative; /* Crucial for absolute positioning of loading screen */
       min-height: 880px;
       display: flex;
       flex-direction: column;
@@ -708,24 +708,28 @@
 
     /* Loading Screen Styles */
     #loading-screen {
-      position: fixed;
+      /* Changed from fixed to absolute, so it's relative to #game-container */
+      position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 1199;
+      z-index: 1199; /* Keep a high z-index to cover content within game-container */
       display: flex;
       align-items: center;
       justify-content: center;
       background-color: #f7f0e8; /* Game's main background color */
       background-size: cover;
       transition: opacity 0.5s ease-out;
+      border-radius: 25px; /* Inherit parent's border-radius for visual consistency */
+      overflow: hidden; /* Hide overflow if content goes beyond rounded corners */
     }
     #loading-screen::before {
       content: '';
-      position: fixed;
+      /* Changed from fixed to absolute */
+      position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
       background-image: url('mao3.webp');
       background-repeat: no-repeat;
       background-position: center center;
-      background-attachment: fixed; /* Key change for fixed background */
+      /* Removed background-attachment: fixed; as it's no longer full screen */
       background-size: cover;
       opacity: 0.6;
     }
@@ -854,20 +858,20 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<!-- Loading Screen -->
-<div id="loading-screen">
-  <div class="loading-content">
-    <h1 class="loading-title">Loading.</h1>
-    <div class="progress-bar-container">
-      <div id="progress-bar"></div>
-    </div>
-    <p id="loading-text">正在加载资源...</p>
-    <small class="loading-footer">喵了个咪 &copy; 2025 | Designed by 开元</small>
-  </div>
-</div>
-
 <!-- Game Container -->
 <div id="game-container">
+  <!-- Loading Screen (Moved inside game-container) -->
+  <div id="loading-screen">
+    <div class="loading-content">
+      <h1 class="loading-title">Loading.</h1>
+      <div class="progress-bar-container">
+        <div id="progress-bar"></div>
+      </div>
+      <p id="loading-text">正在加载资源...</p>
+      <small class="loading-footer">喵了个咪 &copy; 2025 | Designed by 开元</small>
+    </div>
+  </div>
+
   <!-- Header Bar -->
   <div id="header-bar">
     <div id="progress-info">关卡: 1 / 2 | 剩余卡牌: --</div>
@@ -1243,6 +1247,7 @@ function genLevel(levelIdx){
 
       // Clamp positions within bounds
       tempX = Math.max(5, Math.min(tempX, areaW - cardW - 5));
+      // Corrected: Removed extra parenthesis here
       tempY = Math.max(5, Math.min(tempY, areaH - cardH - 5));
 
       let overlap = false;
@@ -2019,7 +2024,7 @@ function initializeLoadingScreen() {
     const progressBar = document.getElementById('progress-bar');
     const loadingText = document.getElementById('loading-text');
 
-    document.body.classList.add('no-scroll'); // Add no-scroll class to body
+    // document.body.classList.add('no-scroll'); // No longer needed for body as loading screen is contained
 
     let progress = 0;
     const assets = ["加载字体...", "加载音效...", "加载图片...", "初始化关卡...", "准备喵咪...", "完成!"];
@@ -2040,7 +2045,7 @@ function initializeLoadingScreen() {
                 loadingScreen.style.opacity = '0';
                 loadingScreen.addEventListener('transitionend', () => {
                     loadingScreen.style.display = 'none';
-                    document.body.classList.remove('no-scroll'); // Remove no-scroll class
+                    // document.body.classList.remove('no-scroll'); // No longer needed
                     document.title = "喵了个咪"; // Set final page title
                     initializeGame(); // Initialize the game
                 }, { once: true });
