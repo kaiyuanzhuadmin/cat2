@@ -20,9 +20,9 @@ $(function(){
     
     // 一些计算所需的变量
     var seekT, seekLoc, seekBarPos, cM, ctMinutes, ctSeconds, curMinutes, curSeconds, durMinutes, durSeconds, playProgress, bTime, nTime = 0
-    var musicImgsData = ['img/bg1.webp',
-                         'img/bg2.webp',
-                         'img/bg3.webp']    // 图片地址数组
+    var musicImgsData = ['img/bg.webp',
+                         'img/bg1.webp',
+                         'img/bg2.webp']    // 图片地址数组
     var musicNameData = ['稻香',
                          'Symphony',
                          'Mood (Lofi)'];                   // 歌曲名数组
