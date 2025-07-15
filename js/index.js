@@ -20,7 +20,7 @@ $(function(){
     
     // 一些计算所需的变量
     var seekT, seekLoc, seekBarPos, cM, ctMinutes, ctSeconds, curMinutes, curSeconds, durMinutes, durSeconds, playProgress, bTime, nTime = 0
-    var musicImgsData = ['img/https://img3.kuwo.cn/star/albumcover/500/s4s0/93/1794217775.jpg',
+    var musicImgsData = ['https://img3.kuwo.cn/star/albumcover/500/s4s0/93/1794217775.jpg',
                          'img/bg1.webp',
                          'img/bg2.webp']    // 图片地址数组
     var musicNameData = ['稻香',
@@ -29,7 +29,7 @@ $(function(){
     var artistNameData = ['周杰伦',
                           'One Voice/Rob Landes',
                           'Hloshit']            // 创作歌手数组
-    var musicUrls=['mp3/https://ra-sycdn.kuwo.cn/752a8cd36824238653c22556b21f2b0d/68762eaf/resource/n3/128/40/70/356596524.mp3',
+    var musicUrls=['https://ra-sycdn.kuwo.cn/752a8cd36824238653c22556b21f2b0d/68762eaf/resource/n3/128/40/70/356596524.mp3',
                    'mp3/music2.mp3',
                    'mp3/music3.mp3'];// 歌曲mp3数组
     var currIndex = -1;              // 当前播放索引
