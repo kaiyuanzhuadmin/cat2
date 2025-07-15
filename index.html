@@ -1872,7 +1872,7 @@ function handleCloseGame(type) {
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize loading screen
     initializeLoadingScreen();
-
+    attemptVideoAutoplay();
     // Code input feedback and auto-redeem logic
     const feedbackDiv = document.createElement('div');
     feedbackDiv.style.color = 'red';
