@@ -460,7 +460,6 @@
       box-sizing: border-box;
     }
     
-    /* MODIFICATION START: Video Background */
     #start-screen-video {
         position: absolute;
         top: 50%;
@@ -471,10 +470,9 @@
         width: auto;
         height: auto;
         z-index: -1; /* Sits on top of the ::before pseudo-element */
-        opacity: 0.99;
+        opacity: 0.5;
         background-size: cover;
     }
-    /* MODIFICATION END: Video Background */
 
     /* Start Screen background image (FALLBACK) */
     #start-screen::before {
@@ -484,8 +482,8 @@
       background-image: url('mao.webp');
       background-size: cover;
       background-position: center;
-      opacity: 0.4; /* 40% opacity */
-      z-index: -2; /* MODIFIED: Place it behind the video */
+      opacity: 0.5; /* 50% opacity */
+      z-index: -2; /* Place it behind the video */
     }
     #start-screen h1 {
       font-size: 4rem;
@@ -927,7 +925,7 @@
 
   <!-- Start Screen -->
   <div id="start-screen">
-    <!-- MODIFICATION: Added video background with image fallback -->
+    <!-- MODIFICATION: Removed onerror, will be handled by JS -->
     <video id="start-screen-video" autoplay muted loop playsinline src="mao.mp4"></video>
     <h1><span>喵</span><span>了</span><span>个</span><span>咪</span><span> 🐾</span></h1>
     <p> </p> <p>
@@ -1870,6 +1868,24 @@ function handleCloseGame(type) {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
+    // MODIFICATION START: Attempt to autoplay video on mobile
+    const video = document.getElementById('start-screen-video');
+    if (video) {
+        // The play() method returns a promise which resolves if playback starts,
+        // and rejects if the browser blocks it.
+        const playPromise = video.play();
+
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                // Autoplay was prevented.
+                console.log("视频自动播放被浏览器阻止:", error);
+                // Hide the video to show the fallback image.
+                video.style.display = 'none';
+            });
+        }
+    }
+    // MODIFICATION END
+
     // Initialize loading screen
     initializeLoadingScreen();
 
