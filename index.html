@@ -2079,6 +2079,38 @@ function initializeLoadingScreen() {
         }
     }, 250); // Update interval
 }
+function attemptVideoAutoplay() {
+    const video = document.getElementById('start-screen-video');
+    if (!video) return;
+
+    // 1. 尝试直接播放 (适用于某些安卓微信和桌面浏览器)
+    const playPromise = video.play();
+
+    if (playPromise !== undefined) {
+        playPromise.catch(error => {
+            console.log("视频直接播放失败，等待用户交互或 WeixinJSBridgeReady 事件。", error);
+            // 播放失败，添加触摸监听作为备用方案
+            document.body.addEventListener('touchstart', function onFirstTouch() {
+                video.play().catch(e => console.error("触摸后视频播放失败:", e));
+                // 为避免重复触发，第一次触摸后移除监听器
+                document.body.removeEventListener('touchstart', onFirstTouch);
+            }, { once: true }); // 使用 {once: true} 也能确保只执行一次
+        });
+    }
+
+    // 2. 专门为微信环境添加 WeixinJSBridgeReady 监听
+    if (typeof WeixinJSBridge == "object" && typeof WeixinJSBridge.invoke == "function") {
+        WeixinJSBridge.invoke('getNetworkType', {}, function(e) {
+            video.play().catch(err => console.error("WeixinJSBridge准备好后播放失败:", err));
+        });
+    } else {
+        document.addEventListener("WeixinJSBridgeReady", function() {
+            WeixinJSBridge.invoke('getNetworkType', {}, function(e) {
+                video.play().catch(err => console.error("WeixinJSBridgeReady事件触发后播放失败:", err));
+            });
+        }, false);
+    }
+}
 </script>
 </body>
 </html>
