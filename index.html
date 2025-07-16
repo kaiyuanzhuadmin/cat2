@@ -485,7 +485,7 @@
       background-image: url('mao.webp');
       background-size: cover;
       background-position: center;
-      opacity: 0.4; /* 40% opacity */
+      opacity: 0.5; /* 50% opacity */
       z-index: -2; /* MODIFIED: Place it behind the video */
     }
     #start-screen h1 {
@@ -929,7 +929,12 @@
   <!-- Start Screen -->
   <div id="start-screen">
     <!-- MODIFICATION: Added video background with image fallback -->
-    <video id="start-screen-video" autoplay muted loop playsinline src="mao.mp4" onerror="this.style.display='none'"></video>
+   <video id="start-screen-video" autoplay loop muted playsinline>
+  <source src="mao.webm" type="video/webm">
+  <source src="mao.mp4" type="video/mp4">
+  <!-- 若两种格式都无法播放，可添加一张备用图片 -->
+  <img src="mao.webp" alt="背景图">
+</video>
     <h1><span>喵</span><span>了</span><span>个</span><span>咪</span><span> 🐾</span></h1>
     <p> </p> <p>
       <button class="start-btn" id="start-btn">开始游戏</button>
