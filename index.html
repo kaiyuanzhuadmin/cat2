@@ -929,11 +929,7 @@
   <!-- Start Screen -->
   <div id="start-screen">
     <!-- MODIFICATION: Added video background with image fallback -->
-    <video id="start-screen-video" autoplay muted loop playsinline>
-  <source src="mao.mp4" type="video/mp4">
-  <source src="mao.webm" type="video/webm">
-  <small>您的浏览器或网络状况不支持动态播放。</small>
-</video>
+    <video id="start-screen-video" autoplay muted loop playsinline src="mao.mp4" onerror="this.style.display='none'"></video>
     <h1><span>喵</span><span>了</span><span>个</span><span>咪</span><span> 🐾</span></h1>
     <p> </p> <p>
       <button class="start-btn" id="start-btn">开始游戏</button>
